@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Can I Bind?</title>
+    <script>
+      var base = "/canibind/";
+      var path = window.location.pathname.replace(/^\/canibind/, "") + window.location.search + window.location.hash;
+      window.location.replace(base + "?p=" + encodeURIComponent(path));
+    </script>
+  </head>
+  <body></body>
+</html>

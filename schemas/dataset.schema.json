@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://reboot81.github.io/canibind/schemas/dataset.schema.json",
+  "title": "Can I Bind dataset",
+  "type": "object",
+  "required": ["schemaVersion", "generatedAt", "minimumContributionSize", "records"],
+  "properties": {
+    "schemaVersion": { "type": "string" },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "minimumContributionSize": { "type": "integer", "minimum": 1 },
+    "records": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["shortcut", "intent", "capability", "recommendation", "browsers", "operatingSystems", "layouts", "evidence", "note"],
+        "properties": {
+          "shortcut": { "type": "string" },
+          "intent": { "enum": ["general", "undo", "save", "search", "list", "new-record"] },
+          "capability": { "enum": ["yes", "conditional", "no", "lack-of-data"] },
+          "recommendation": { "enum": ["recommended", "acceptable", "avoid", "lack-of-data"] },
+          "browsers": { "type": "array", "items": { "type": "string" } },
+          "operatingSystems": { "type": "array", "items": { "type": "string" } },
+          "layouts": { "type": "array", "items": { "type": "string" } },
+          "evidence": { "enum": ["observed", "expected", "none"] },
+          "note": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}
