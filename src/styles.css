@@ -94,6 +94,9 @@ kbd { padding: 3px 7px; border: 1px solid var(--line-strong); border-bottom-widt
 
 .brand { display: inline-flex; align-items: center; gap: 10px; color: var(--text); text-decoration: none; font-weight: 750; }
 .brand-mark { width: 36px; height: 32px; display: grid; place-items: center; border: 1px solid var(--line-strong); background: var(--surface-alt); font: 700 10px ui-monospace, monospace; }
+.brand-copy { display: grid; gap: 2px; }
+.brand-copy strong { font-size: 14px; line-height: 1.1; }
+.brand-copy small { color: var(--muted); font-size: 10px; font-weight: 500; line-height: 1.2; white-space: nowrap; }
 .topbar nav { display: flex; align-items: center; gap: 22px; font-size: 13px; }
 .topbar nav a { color: var(--text); text-decoration: none; }
 .topbar nav a:hover { text-decoration: underline; }
@@ -177,7 +180,7 @@ select { width: 100%; padding: 9px 34px 9px 10px; border: 1px solid var(--line-s
 .keyboard-key { flex: 0 0 66px; height: 56px; padding: 8px; display: grid; place-items: center; border: 2px solid var(--line-strong); border-bottom-width: 4px; border-radius: 4px; color: var(--unknown); background: var(--unknown-bg); cursor: pointer; }
 .keyboard-key:hover { filter: brightness(.96); }
 .keyboard-key span { font: 650 12px ui-monospace, monospace; }
-.keyboard-key.key-wide { flex-basis: 92px; }
+.keyboard-key.key-wide { flex-basis: 112px; }
 .keyboard-key.key-space { flex-basis: 360px; }
 .key-recommended { color: var(--yes); border-color: var(--yes); background: var(--yes-bg); }
 .key-acceptable { color: var(--conditional); border-color: var(--conditional); background: var(--conditional-bg); }
@@ -225,6 +228,8 @@ select { width: 100%; padding: 9px 34px 9px 10px; border: 1px solid var(--line-s
 .about-grid p, .about-grid li { color: var(--muted); line-height: 1.6; }
 .subheading { margin: 46px 0 15px; font-size: 22px; }
 .table-wrap { overflow-x: auto; border: 1px solid var(--line-strong); }
+.terminology-note { margin: 12px 0 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
+.terminology-note code { padding: 1px 4px; border: 1px solid var(--line); background: var(--surface-alt); color: var(--text); }
 table { width: 100%; border-collapse: collapse; background: var(--surface); font-size: 14px; }
 th, td { padding: 13px 15px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
 th { background: var(--surface-alt); font-size: 12px; }
@@ -250,7 +255,7 @@ footer > div:last-child { display: flex; gap: 18px; }
 
 @media (max-width: 680px) {
   .hero, .context-panel, .verdict-grid, .lab-section, .contribute-section, .about-section, footer { width: min(100% - 24px, 1180px); }
-  .topbar { padding-inline: 12px; }.theme-control > span { display: none; }
+  .topbar { padding-inline: 12px; }.brand-copy small, .theme-control > span { display: none; }
   .hero { padding-top: 48px; }.hero h1 { font-size: 40px; }.hero-subtitle { font-size: 16px; }
   .listener { grid-template-columns: 1fr auto; }.listener kbd { grid-column: 1 / -1; grid-row: 2; justify-self: start; }
   .context-panel { grid-template-columns: 1fr; }

@@ -37,11 +37,11 @@ const intents: { value: Intent; label: string }[] = [
 const modifierChoices: Record<KeyboardPlatform, { label: string; value: string }[]> = {
   windows: [
     { label: "Ctrl", value: "Control" }, { label: "Alt", value: "Alt" },
-    { label: "Shift", value: "Shift" }, { label: "Win", value: "Meta" },
+    { label: "Shift", value: "Shift" }, { label: "Windows", value: "Meta" },
   ],
   mac: [
-    { label: "⌘ Command", value: "Meta" }, { label: "⌃ Control", value: "Control" },
-    { label: "⌥ Option", value: "Alt" }, { label: "Shift", value: "Shift" },
+    { label: "Command (⌘)", value: "Meta" }, { label: "Control (⌃)", value: "Control" },
+    { label: "Option (⌥)", value: "Alt" }, { label: "Shift", value: "Shift" },
   ],
 };
 
@@ -52,7 +52,7 @@ const initialLabCode = `<!doctype html>
   output { display: block; margin-top: 16px; padding: 12px; background: #eef2f7; }
 </style>
 <h1>Keyboard shortcut test</h1>
-<p>Press Ctrl/Cmd + S or Ctrl/Cmd + Z in this pane.</p>
+<p>Press Ctrl + S / Command (⌘) + S or Ctrl + Z / Command (⌘) + Z in this pane.</p>
 <output id="result">Waiting for a shortcut…</output>
 <script>
   addEventListener("keydown", (event) => {
@@ -71,6 +71,11 @@ function statusLabel(value: Capability | Recommendation): string {
 
 function layoutLabel(layout: Layout): string {
   return layouts.find((item) => item.value === layout)?.label ?? layout;
+}
+
+function platformShortcutLabel(shortcut: string, platform: KeyboardPlatform): string {
+  if (platform === "windows") return shortcut.replace(/\bWin\b/g, "Windows");
+  return shortcut.replaceAll("Ctrl", "Command (⌘)").replaceAll("Alt", "Option (⌥)");
 }
 
 export default function App() {
@@ -147,7 +152,7 @@ export default function App() {
   const keyboard = useMemo(() => keyboardRows(environment.layout, keyboardPlatform), [environment.layout, keyboardPlatform]);
   const contributionFinished = contributionResults.length === contributionShortcuts.length;
   const expectedContribution = contributionShortcuts[contributionIndex];
-  const displayedExpectedContribution = (keyboardPlatform === "mac" ? expectedContribution?.replace(/^Ctrl/, "⌘") : expectedContribution) ?? "";
+  const displayedExpectedContribution = expectedContribution ? platformShortcutLabel(expectedContribution, keyboardPlatform) : "";
 
   const switchKeyboardPlatform = (platform: KeyboardPlatform) => {
     setKeyboardPlatform(platform);
@@ -199,7 +204,7 @@ export default function App() {
   return (
     <main>
       <header className="topbar">
-        <a className="brand" href={import.meta.env.BASE_URL} aria-label="Can I Bind home"><span className="brand-mark">CIB?</span><span>Can I Bind?</span></a>
+        <a className="brand" href={import.meta.env.BASE_URL} aria-label="Can I Bind home"><span className="brand-mark">CIB?</span><span className="brand-copy"><strong>Can I Bind?</strong><small>Open data for usable keyboard interfaces.</small></span></a>
         <nav aria-label="Primary navigation">
           <a href="#explore">{copy.nav.test}</a><a href="#keyboard">{copy.nav.keyboard}</a><a href="#lab">{copy.nav.lab}</a><a href="#contribute">{copy.nav.contribute}</a><a href="#about">{copy.nav.about}</a>
         </nav>
@@ -268,12 +273,13 @@ export default function App() {
 
         <h3 className="subheading">Convention guardrails</h3>
         <div className="table-wrap"><table><thead><tr><th>Action</th><th>Windows / Linux</th><th>macOS</th><th>Guidance</th></tr></thead><tbody>
-          <tr><td>Undo</td><td><kbd>Ctrl + Z</kbd></td><td><kbd>⌘ + Z</kbd></td><td>Established convention. Do not reuse for Save.</td></tr>
-          <tr><td>Redo</td><td><kbd>Ctrl + Y</kbd></td><td><kbd>⌘ + Shift + Z</kbd></td><td>Platform conventions differ.</td></tr>
-          <tr><td>Save</td><td><kbd>Ctrl + S</kbd></td><td><kbd>⌘ + S</kbd></td><td>Strong convention; verify browser Save Page conflict.</td></tr>
-          <tr><td>Find</td><td><kbd>Ctrl + F</kbd></td><td><kbd>⌘ + F</kbd></td><td>Familiar but competes with browser Find.</td></tr>
+          <tr><td>Undo</td><td><kbd>Ctrl + Z</kbd></td><td><kbd>Command (⌘) + Z</kbd></td><td>Established convention. Do not reuse for Save.</td></tr>
+          <tr><td>Redo</td><td><kbd>Ctrl + Y</kbd></td><td><kbd>Command (⌘) + Shift + Z</kbd></td><td>Platform conventions differ.</td></tr>
+          <tr><td>Save</td><td><kbd>Ctrl + S</kbd></td><td><kbd>Command (⌘) + S</kbd></td><td>Strong convention; verify browser Save Page conflict.</td></tr>
+          <tr><td>Find</td><td><kbd>Ctrl + F</kbd></td><td><kbd>Command (⌘) + F</kbd></td><td>Familiar but competes with browser Find.</td></tr>
           <tr><td>Help / shortcuts</td><td><kbd>?</kbd></td><td><kbd>?</kbd></td><td>Poor international choice where the character requires Shift.</td></tr>
         </tbody></table></div>
+        <p className="terminology-note"><strong>Terminology:</strong> Can I Bind? uses Command (⌘) on macOS and Windows for the Windows key. Browser code exposes both through the technical <code>Meta</code> modifier.</p>
 
         <h3 className="subheading">Standards and references</h3>
         <div className="reference-list">

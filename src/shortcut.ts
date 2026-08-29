@@ -7,8 +7,8 @@ const modifierDisplayOrder: Record<KeyboardPlatform, string[]> = {
   mac: ["Meta", "Control", "Alt", "Shift"],
 };
 const modifierLabels: Record<KeyboardPlatform, Record<string, string>> = {
-  windows: { Control: "Ctrl", Alt: "Alt", Shift: "Shift", Meta: "Win" },
-  mac: { Control: "Control", Alt: "Option", Shift: "Shift", Meta: "Command" },
+  windows: { Control: "Ctrl", Alt: "Alt", Shift: "Shift", Meta: "Windows" },
+  mac: { Control: "Control (⌃)", Alt: "Option (⌥)", Shift: "Shift", Meta: "Command (⌘)" },
 };
 
 export function shortcutFromEvent(event: KeyboardEvent, platform: KeyboardPlatform = "windows", layout: Layout = "us"): Shortcut | null {

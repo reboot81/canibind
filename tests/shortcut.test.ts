@@ -32,7 +32,7 @@ describe("shortcut model", () => {
       key: "\uf8ff", code: "KeyA", ctrlKey: false, altKey: true, shiftKey: false, metaKey: false,
     } as KeyboardEvent, "mac", "swedish");
 
-    expect(shortcut).toMatchObject({ id: "alt-a", display: "Option + A", key: "A", code: "KeyA", logicalKey: "\uf8ff" });
+    expect(shortcut).toMatchObject({ id: "alt-a", display: "Option (⌥) + A", key: "A", code: "KeyA", logicalKey: "\uf8ff" });
   });
 
   it("uses the selected physical layout instead of the produced character", () => {
@@ -46,6 +46,6 @@ describe("shortcut model", () => {
   it("combines independently selected macOS modifiers in a stable order", () => {
     const shortcut = shortcutFromSelection("Z", ["Shift", "Meta"], "mac");
 
-    expect(shortcut).toEqual({ id: "meta-shift-z", display: "Command + Shift + Z", modifiers: ["Meta", "Shift"], key: "Z" });
+    expect(shortcut).toEqual({ id: "meta-shift-z", display: "Command (⌘) + Shift + Z", modifiers: ["Meta", "Shift"], key: "Z" });
   });
 });
