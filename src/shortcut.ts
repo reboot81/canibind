@@ -93,7 +93,7 @@ export function recommendationFor(key: string, modifiers: string[], intent: Inte
       reason: browserConflict ? `${convention.label} is understandable, but this shortcut competes with browser chrome.` : `${convention.label} follows a widely understood platform convention.`,
     };
   }
-  if (["R", "W", "T"].includes(upper)) return { value: "avoid", reason: "This combination conflicts with a critical browser action." };
+  if (["Q", "R", "W", "T"].includes(upper)) return { value: "avoid", reason: "This combination conflicts with a critical browser action." };
   if (convention && intent !== "general") return { value: "avoid", reason: `Ctrl + ${upper} conventionally means ${convention.label}, not the selected action.` };
   return { value: "acceptable", reason: "No strong convention is known, but verify browser, OS, assistive technology, and layout conflicts." };
 }

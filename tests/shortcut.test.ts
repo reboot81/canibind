@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { contributionShortcuts } from "../src/keyboard";
 import { normalizeKey, recommendationFor, shortcutFromEvent, shortcutFromSelection, shortcutPath, shouldCaptureShortcut } from "../src/shortcut";
 
 describe("shortcut model", () => {
@@ -47,5 +48,12 @@ describe("shortcut model", () => {
     const shortcut = shortcutFromSelection("Z", ["Shift", "Meta"], "mac");
 
     expect(shortcut).toEqual({ id: "meta-shift-z", display: "Command (⌘) + Shift + Z", modifiers: ["Meta", "Shift"], key: "Z" });
+  });
+
+  it("keeps destructive browser shortcuts out of guided contributions", () => {
+    const excluded = ["Ctrl + W", "Ctrl + R", "Ctrl + Q", "Ctrl + T", "Alt + Left", "Alt + Right", "Alt + F4", "F5"];
+
+    expect(contributionShortcuts).toHaveLength(20);
+    expect(contributionShortcuts.filter((shortcut) => excluded.includes(shortcut))).toEqual([]);
   });
 });

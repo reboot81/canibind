@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { detectBrowserOverride, detectEnvironment, detectKeyboardLayout } from "./environment";
 import { t } from "./i18n";
 import { contributionShortcuts, keyboardRows } from "./keyboard";
@@ -100,6 +100,8 @@ export default function App() {
   const [contributionChoice, setContributionChoice] = useState<ContributionResult["result"] | null>(null);
   const [contributionResults, setContributionResults] = useState<ContributionResult[]>([]);
   const [observedContributionKey, setObservedContributionKey] = useState<string | null>(null);
+  const [detectedKeyCode, setDetectedKeyCode] = useState<string | null>(null);
+  const detectionFlashTimer = useRef<number | null>(null);
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -129,15 +131,26 @@ export default function App() {
       const next = shortcutFromEvent(event, platform, environment.layout);
       if (!next) return;
       setShortcut(next);
+      setKeyboardPlatform(platform);
+      setModifiers(next.modifiers);
       setLiveCapability("conditional");
       setLastDetectedAt(new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" }));
       setTestCount((count) => count + 1);
       setObservedContributionKey(next.display);
+      setDetectedKeyCode(null);
+      window.requestAnimationFrame(() => {
+        setDetectedKeyCode(event.code);
+        if (detectionFlashTimer.current !== null) window.clearTimeout(detectionFlashTimer.current);
+        detectionFlashTimer.current = window.setTimeout(() => setDetectedKeyCode(null), 1100);
+      });
       const base = import.meta.env.BASE_URL.replace(/\/$/, "");
       window.history.replaceState(null, "", `${base}${shortcutPath(next, environment.browser, environment.os)}`);
     };
     window.addEventListener("keydown", onKeyDown, { capture: true });
-    return () => window.removeEventListener("keydown", onKeyDown, { capture: true });
+    return () => {
+      window.removeEventListener("keydown", onKeyDown, { capture: true });
+      if (detectionFlashTimer.current !== null) window.clearTimeout(detectionFlashTimer.current);
+    };
   }, [environment.browser, environment.layout, environment.os, isListening]);
 
   useEffect(() => {
@@ -247,7 +260,8 @@ export default function App() {
           {keyboard.map((row, rowIndex) => <div className="keyboard-row" key={rowIndex}>{row.map((item) => {
             const rec = recommendationFor(item.label, modifiers, intent, environment.layout);
             const isCurrent = shortcut.key.toUpperCase() === item.label.toUpperCase() && shortcut.modifiers.length === modifiers.length && modifiers.every((modifier) => shortcut.modifiers.includes(modifier));
-            return <button type="button" className={`keyboard-key key-${rec.value} ${item.size ? `key-${item.size}` : ""} ${isCurrent ? "current-key" : ""}`} title={rec.reason} aria-label={`${item.label}: ${statusLabel(rec.value)}`} onClick={() => selectKeyboardKey(item.label)} key={`${item.code}-${item.label}`}><span>{item.label}</span></button>;
+            const isDetected = item.code === detectedKeyCode;
+            return <button type="button" className={`keyboard-key key-${rec.value} ${item.size ? `key-${item.size}` : ""} ${isCurrent ? "current-key" : ""} ${isDetected ? "detected-key" : ""}`} title={rec.reason} aria-label={`${item.label}: ${statusLabel(rec.value)}`} onClick={() => selectKeyboardKey(item.label)} key={`${item.code}-${item.label}`}><span>{item.label}</span></button>;
           })}</div>)}
         </div>
         <div className="legend"><span><i className="legend-recommended" /> Recommended</span><span><i className="legend-acceptable" /> Acceptable</span><span><i className="legend-avoid" /> Avoid</span><span><i className="legend-lack" /> Lack of data</span></div>
@@ -260,7 +274,7 @@ export default function App() {
 
       <section className="contribute-section" id="contribute">
         <div className="section-heading"><div><p className="eyebrow">Community evidence</p><h2>Run a guided contribution test</h2><p>Test at least {dataset?.minimumContributionSize ?? 20} combinations. After each one, record whether the page and intended action worked and whether a competing browser or OS action appeared.</p></div><span className="progress-label">{contributionResults.length} / {contributionShortcuts.length}</span></div>
-        {!contributionActive ? <div className="contribute-start"><ul><li>Browser and operating system are detected where possible.</li><li>Keyboard layout must be confirmed.</li><li>No account identifier or IP address is added to the public dataset.</li><li>Results remain unverified until independently reproduced.</li></ul><button className="primary-button" type="button" onClick={startContribution}>Start guided test</button></div> : contributionFinished ? <div className="contribute-finished"><strong>Test run complete</strong><p>{contributionResults.filter((result) => result.result === "yes").length} worked, {contributionResults.filter((result) => result.result === "conditional").length} were conditional, and {contributionResults.filter((result) => result.result === "no").length} did not work.</p><a className="primary-button" href="https://github.com/reboot81/canibind/issues/new">Review and prepare contribution ↗</a></div> : <div className="guided-test">
+        {!contributionActive ? <div className="contribute-start"><ul><li>Browser and operating system are detected where possible.</li><li>Keyboard layout must be confirmed.</li><li>Known close, quit, reload, and navigation shortcuts are excluded from the guided test.</li><li>No account identifier or IP address is added to the public dataset.</li><li>Results remain unverified until independently reproduced.</li></ul><button className="primary-button" type="button" onClick={startContribution}>Start guided test</button></div> : contributionFinished ? <div className="contribute-finished"><strong>Test run complete</strong><p>{contributionResults.filter((result) => result.result === "yes").length} worked, {contributionResults.filter((result) => result.result === "conditional").length} were conditional, and {contributionResults.filter((result) => result.result === "no").length} did not work.</p><a className="primary-button" href="https://github.com/reboot81/canibind/issues/new">Review and prepare contribution ↗</a></div> : <div className="guided-test">
           <div className="test-target"><small>Test {contributionIndex + 1} of {contributionShortcuts.length}</small><kbd>{displayedExpectedContribution}</kbd><p>{observedContributionKey ? `Latest detected event: ${observedContributionKey}` : "Press the combination, then return here and record what happened."}</p></div>
           <fieldset><legend>What happened?</legend>{[["yes","Worked — handler ran and no competing action appeared"],["conditional","Worked with a condition or conflict"],["no","Did not work or the browser / OS won"]].map(([value, label]) => <label key={value}><input type="radio" name="contribution-result" value={value} checked={contributionChoice === value} onChange={() => setContributionChoice(value as ContributionResult["result"])} /><span>{label}</span></label>)}</fieldset>
           <button className="primary-button" type="button" disabled={!contributionChoice} onClick={recordContribution}>Record and continue</button>

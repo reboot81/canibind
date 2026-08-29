@@ -187,6 +187,11 @@ select { width: 100%; padding: 9px 34px 9px 10px; border: 1px solid var(--line-s
 .key-avoid { color: var(--no); border-color: var(--no); background: var(--no-bg); }
 .key-lack-of-data { color: var(--unknown); border-color: var(--line-strong); background: repeating-linear-gradient(135deg, var(--unknown-bg), var(--unknown-bg) 8px, var(--surface-alt) 8px, var(--surface-alt) 16px); }
 .keyboard-key.current-key { outline: 4px solid var(--focus); outline-offset: 2px; }
+.keyboard-key.detected-key { position: relative; z-index: 2; animation: detected-key-flash 1.05s ease-out; }
+@keyframes detected-key-flash {
+  0%, 34%, 68%, 100% { transform: translateY(0); box-shadow: none; filter: brightness(1); }
+  17%, 51% { transform: translateY(-3px); box-shadow: 0 0 0 7px color-mix(in srgb, var(--focus) 38%, transparent), 0 0 24px color-mix(in srgb, var(--focus) 72%, transparent); filter: brightness(1.55); }
+}
 .legend { margin-top: 18px; display: flex; gap: 22px; flex-wrap: wrap; color: var(--muted); font-size: 12px; }
 .legend span { display: inline-flex; align-items: center; gap: 7px; }
 .legend i { width: 20px; height: 12px; border-radius: 2px; background: currentColor; }
@@ -267,4 +272,4 @@ footer > div:last-child { display: flex; gap: 18px; }
   footer { grid-template-columns: 1fr; }footer > div:last-child { flex-wrap: wrap; }
 }
 
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .keyboard-key.detected-key { animation: none; box-shadow: 0 0 0 6px var(--focus); filter: brightness(1.35); } }

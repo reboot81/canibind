@@ -27,6 +27,7 @@ export function keyboardRows(layout: Layout, platform: KeyboardPlatform): KeyDef
 }
 
 export const contributionShortcuts = [
-  "Ctrl + F","Ctrl + S","Ctrl + Z","Ctrl + N","Ctrl + L","Ctrl + R","Ctrl + W","Ctrl + T","Ctrl + P","Ctrl + K",
-  "Ctrl + Shift + P","Ctrl + Shift + Z","Ctrl + Alt + X","Alt + F","Alt + Left","Alt + Right","F1","F2","F5","Escape",
+  "Ctrl + F","Ctrl + S","Ctrl + Z","Ctrl + Y","Ctrl + N","Ctrl + L","Ctrl + P","Ctrl + K",
+  "Ctrl + Shift + P","Ctrl + Shift + Z","Ctrl + Shift + F","Ctrl + Shift + K","Ctrl + Alt + X","Ctrl + Alt + S",
+  "Ctrl + Space","Alt + F","F1","F2","F3","Escape",
 ];
