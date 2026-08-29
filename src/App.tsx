@@ -211,7 +211,7 @@ export default function App() {
             const rec = recommendationFor(item.label, modifier ? [modifier] : [], intent, environment.layout);
             const modifierLabel = keyboardPlatform === "mac" && modifier === "Control" ? "⌘" : modifier === "Control" ? "Ctrl" : modifier;
             const isCurrent = shortcut.key.toUpperCase() === item.label.toUpperCase() && (modifier ? shortcut.modifiers.length > 0 : shortcut.modifiers.length === 0);
-            return <button type="button" className={`keyboard-key key-${rec.value} ${item.size ? `key-${item.size}` : ""} ${isCurrent ? "current-key" : ""}`} title={rec.reason} onClick={() => setShortcut({ id: `${modifier ? modifier.toLowerCase() + "-" : ""}${item.label.toLowerCase()}`, display: `${modifierLabel ? modifierLabel + " + " : ""}${item.label}`, modifiers: modifier ? [modifier] : [], key: item.label })} key={`${item.code}-${item.label}`}><span>{item.label}</span><i aria-label={statusLabel(rec.value)} /></button>;
+            return <button type="button" className={`keyboard-key key-${rec.value} ${item.size ? `key-${item.size}` : ""} ${isCurrent ? "current-key" : ""}`} title={rec.reason} aria-label={`${item.label}: ${statusLabel(rec.value)}`} onClick={() => setShortcut({ id: `${modifier ? modifier.toLowerCase() + "-" : ""}${item.label.toLowerCase()}`, display: `${modifierLabel ? modifierLabel + " + " : ""}${item.label}`, modifiers: modifier ? [modifier] : [], key: item.label })} key={`${item.code}-${item.label}`}><span>{item.label}</span></button>;
           })}</div>)}
         </div>
         <div className="legend"><span><i className="legend-recommended" /> Recommended</span><span><i className="legend-acceptable" /> Acceptable</span><span><i className="legend-avoid" /> Avoid</span><span><i className="legend-lack" /> Lack of data</span></div>
@@ -265,5 +265,5 @@ function DetectedSelect({ label, detected, value, detail, options, onChange }: {
 }
 
 function VerdictCard({ title, value, heading, text, label, detail }: { title: string; value: Capability | Recommendation; heading?: string; text: string; label: string; detail: string }) {
-  return <article className="verdict-card"><div className="card-heading"><p>{title}</p><span className={`status-dot status-${value}`}><i /></span></div><h2>{heading ?? statusLabel(value)}</h2><p>{text}</p><div className="evidence-row"><span>{label}</span><strong>{detail}</strong></div></article>;
+  return <article className="verdict-card"><div className="card-heading"><p>{title}</p><span className={`status-dot status-${value}`} aria-hidden="true" /></div><h2>{heading ?? statusLabel(value)}</h2><p>{text}</p><div className="evidence-row"><span>{label}</span><strong>{detail}</strong></div></article>;
 }

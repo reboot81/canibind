@@ -145,11 +145,10 @@ select { width: 100%; padding: 9px 34px 9px 10px; border: 1px solid var(--line-s
 .verdict-card:last-child { border-right: 0; }
 .card-heading { display: flex; align-items: center; justify-content: space-between; }
 .card-heading p { margin: 0; color: var(--muted); font: 700 11px ui-monospace, monospace; letter-spacing: .06em; text-transform: uppercase; }
-.status-dot { width: 24px; height: 24px; display: grid; place-items: center; border: 2px solid currentColor; border-radius: 50%; background: var(--unknown-bg); color: var(--unknown); }
-.status-dot i { width: 9px; height: 9px; border-radius: 50%; background: currentColor; }
-.status-recommended, .status-yes { color: var(--yes); background: var(--yes-bg); }
-.status-acceptable, .status-conditional { color: var(--conditional); background: var(--conditional-bg); }
-.status-avoid, .status-no { color: var(--no); background: var(--no-bg); }
+.status-dot { width: 30px; height: 30px; flex: 0 0 auto; border-radius: 50%; background: currentColor; color: var(--unknown); }
+.status-recommended, .status-yes { color: var(--yes); }
+.status-acceptable, .status-conditional { color: var(--conditional); }
+.status-avoid, .status-no { color: var(--no); }
 .verdict-card h2 { margin: 28px 0 12px; font-size: 24px; letter-spacing: -.025em; }
 .verdict-card > p { margin: 0; color: var(--muted); line-height: 1.55; font-size: 14px; }
 .evidence-row { margin-top: auto; padding-top: 18px; display: flex; justify-content: space-between; gap: 12px; border-top: 1px solid var(--line); font-size: 11px; }
@@ -175,12 +174,11 @@ select { width: 100%; padding: 9px 34px 9px 10px; border: 1px solid var(--line-s
 .keyboard { padding: 20px; overflow-x: auto; border: 1px solid var(--line-strong); background: var(--surface-alt); }
 .keyboard-row { min-width: 1060px; display: flex; justify-content: center; gap: 7px; margin-bottom: 7px; }
 .keyboard-row:last-child { margin-bottom: 0; }
-.keyboard-key { flex: 0 0 66px; height: 56px; padding: 8px; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; border: 2px solid var(--line-strong); border-bottom-width: 4px; border-radius: 4px; color: var(--unknown); background: var(--unknown-bg); cursor: pointer; }
+.keyboard-key { flex: 0 0 66px; height: 56px; padding: 8px; display: grid; place-items: center; border: 2px solid var(--line-strong); border-bottom-width: 4px; border-radius: 4px; color: var(--unknown); background: var(--unknown-bg); cursor: pointer; }
 .keyboard-key:hover { filter: brightness(.96); }
 .keyboard-key span { font: 650 12px ui-monospace, monospace; }
-.keyboard-key i { width: 13px; height: 13px; border: 2px solid currentColor; border-radius: 50%; background: currentColor; box-shadow: inset 0 0 0 2px var(--surface); }
 .keyboard-key.key-wide { flex-basis: 92px; }
-.keyboard-key.key-space { flex-basis: 360px; align-items: center; }
+.keyboard-key.key-space { flex-basis: 360px; }
 .key-recommended { color: var(--yes); border-color: var(--yes); background: var(--yes-bg); }
 .key-acceptable { color: var(--conditional); border-color: var(--conditional); background: var(--conditional-bg); }
 .key-avoid { color: var(--no); border-color: var(--no); background: var(--no-bg); }
@@ -188,8 +186,8 @@ select { width: 100%; padding: 9px 34px 9px 10px; border: 1px solid var(--line-s
 .keyboard-key.current-key { outline: 4px solid var(--focus); outline-offset: 2px; }
 .legend { margin-top: 18px; display: flex; gap: 22px; flex-wrap: wrap; color: var(--muted); font-size: 12px; }
 .legend span { display: inline-flex; align-items: center; gap: 7px; }
-.legend i { width: 16px; height: 16px; border: 2px solid currentColor; border-radius: 50%; }
-.legend-recommended { color: var(--yes); background: var(--yes-bg); }.legend-acceptable { color: var(--conditional); background: var(--conditional-bg); }.legend-avoid { color: var(--no); background: var(--no-bg); }.legend-lack { color: var(--unknown); background: var(--unknown-bg); }
+.legend i { width: 20px; height: 12px; border-radius: 2px; background: currentColor; }
+.legend-recommended { color: var(--yes); }.legend-acceptable { color: var(--conditional); }.legend-avoid { color: var(--no); }.legend-lack { color: var(--unknown); }
 
 .lab-section, .contribute-section, .about-section { padding-block: 80px; }
 .lab-section { border-bottom: 1px solid var(--line); }
