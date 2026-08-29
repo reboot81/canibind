@@ -301,12 +301,21 @@ export default function App() {
           <a href="https://www.w3.org/WAI/WCAG22/Understanding/character-key-shortcuts.html"><strong>WCAG 2.1.4 — Character Key Shortcuts</strong><span>Single-character shortcuts need a way to turn off, remap, or limit them by focus.</span></a>
           <a href="https://www.w3.org/TR/uievents-key/"><strong>W3C UI Events KeyboardEvent key values</strong><span>Normative logical key names, including media and browser keys.</span></a>
           <a href="https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code"><strong>MDN — KeyboardEvent.code</strong><span>Physical-key identity and the difference from layout-dependent event.key.</span></a>
+          <a href="https://wicg.github.io/keyboard-map/"><strong>WICG — Keyboard Map</strong><span>The experimental specification behind layout-aware physical-key labels.</span></a>
+          <a href="https://developer.mozilla.org/en-US/docs/Web/API/Keyboard/getLayoutMap"><strong>MDN — Keyboard.getLayoutMap()</strong><span>How supported browsers expose the active keyboard layout in a secure context.</span></a>
           <a href="https://www.w3.org/WAI/ARIA/apg/"><strong>ARIA Authoring Practices Guide</strong><span>Expected keyboard interactions for accessible interface patterns.</span></a>
           <a href="https://caniuse.com/?search=keyboard"><strong>Can I Use — keyboard features</strong><span>Browser support for the underlying keyboard APIs.</span></a>
         </div>
+
+        <aside className="about-site-box" aria-labelledby="about-site-title">
+          <div><p className="eyebrow">About this site</p><h3 id="about-site-title">Open data for usable keyboard interfaces.</h3></div>
+          <div><h4>Purpose</h4><p>Can I Bind? separates observed shortcut capability from practical guidance, with browser, operating system, and keyboard layout kept as first-class evidence. Layout is detected only when the browser exposes a reliable map; otherwise it must be selected manually.</p></div>
+          <div><h4>Contact</h4><p><a href="mailto:hello@canibind.example">hello@canibind.example</a><br /><small>Placeholder contact address</small></p></div>
+          <div><h4>Licenses</h4><p>Code, documentation, and design: <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.<br />Public dataset: <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0 1.0</a>.</p></div>
+        </aside>
       </section>
 
-      <footer><div className="brand"><span className="brand-mark">CIB?</span><span>Can I Bind?</span></div><p>Open data for usable keyboard interfaces.</p><div><a href="https://github.com/reboot81/canibind">Source</a><a href={`${import.meta.env.BASE_URL}data/compatibility.v1.json`}>CC0 dataset</a><a href="#about">Methodology</a></div></footer>
+      <footer><a className="brand footer-home" href={import.meta.env.BASE_URL} aria-label="Can I Bind home"><span className="brand-mark">CIB?</span><span>Can I Bind?</span></a><p>Open data for usable keyboard interfaces.</p><div><a href="https://github.com/reboot81/canibind">Source</a><a href={`${import.meta.env.BASE_URL}data/compatibility.v1.json`}>CC0 dataset</a><a href="#about">Methodology</a></div></footer>
     </main>
   );
 }

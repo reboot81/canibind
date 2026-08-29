@@ -245,8 +245,18 @@ tbody tr:last-child td { border-bottom: 0; }
 .reference-list a:nth-last-child(-n+2) { border-bottom: 0; }
 .reference-list a:hover strong { text-decoration: underline; }
 .reference-list span { color: var(--muted); font-size: 13px; line-height: 1.45; }
+.about-site-box { margin-top: 28px; display: grid; grid-template-columns: 1.25fr 1.5fr 1fr 1.2fr; border: 1px solid var(--line-strong); background: var(--surface); }
+.about-site-box > div { min-width: 0; padding: 22px; border-right: 1px solid var(--line); }
+.about-site-box > div:last-child { border-right: 0; }
+.about-site-box .eyebrow { margin-bottom: 8px; }
+.about-site-box h3, .about-site-box h4 { margin: 0; }
+.about-site-box h3 { font-size: 22px; line-height: 1.2; }
+.about-site-box h4 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; }
+.about-site-box p { margin: 10px 0 0; color: var(--muted); font-size: 13px; line-height: 1.55; }
+.about-site-box small { font-size: 11px; }
 
 footer { padding: 36px 0; display: grid; grid-template-columns: 1fr 1fr auto; align-items: center; gap: 28px; border-top: 1px solid var(--line-strong); font-size: 12px; }
+.footer-home:hover .brand-mark { border-color: var(--focus); background: var(--surface); }
 footer > p { color: var(--muted); }
 footer > div:last-child { display: flex; gap: 18px; }
 
@@ -256,6 +266,7 @@ footer > div:last-child { display: flex; gap: 18px; }
   .verdict-grid { grid-template-columns: 1fr; }.verdict-card { border-right: 0; border-bottom: 1px solid var(--line); }.verdict-card:last-child { border-bottom: 0; }
   .code-lab { grid-template-columns: 1fr; }.code-lab > label { border-right: 0; border-bottom: 1px solid var(--line-strong); }
   .guided-test { grid-template-columns: 1fr; }.guided-test .primary-button { width: max-content; }
+  .about-site-box { grid-template-columns: 1fr 1fr; }.about-site-box > div:nth-child(2) { border-right: 0; }.about-site-box > div:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
 }
 
 @media (max-width: 680px) {
@@ -268,7 +279,7 @@ footer > div:last-child { display: flex; gap: 18px; }
   .keyboard-section { padding-inline: 12px; }
   .keyboard-key.key-space { flex-basis: 280px; }
   .contribute-start { grid-template-columns: 1fr; }.contribute-start .primary-button { width: max-content; }
-  .about-grid, .reference-list { grid-template-columns: 1fr; }.about-grid article + article, .reference-list a:nth-child(odd) { border-left: 0; border-right: 0; }.reference-list a:nth-last-child(2) { border-bottom: 1px solid var(--line); }
+  .about-grid, .reference-list, .about-site-box { grid-template-columns: 1fr; }.about-grid article + article, .reference-list a:nth-child(odd) { border-left: 0; border-right: 0; }.reference-list a:nth-last-child(2) { border-bottom: 1px solid var(--line); }.about-site-box > div { border-right: 0; border-bottom: 1px solid var(--line); }.about-site-box > div:last-child { border-bottom: 0; }
   footer { grid-template-columns: 1fr; }footer > div:last-child { flex-wrap: wrap; }
 }
 
