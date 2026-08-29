@@ -55,18 +55,49 @@ const initialLabCode = `<!doctype html>
 <p>Press Ctrl + S / Command (⌘) + S or Ctrl + Z / Command (⌘) + Z in this pane.</p>
 <output id="result">Waiting for a shortcut…</output>
 <script>
-  addEventListener("keydown", (event) => {
+  const output = document.querySelector("#result");
+
+  function handleShortcut(event) {
     if (!(event.ctrlKey || event.metaKey)) return;
-    if (!["s", "z"].includes(event.key.toLowerCase())) return;
+    if (!["KeyS", "KeyZ"].includes(event.code)) return;
+
     event.preventDefault();
-    const action = event.key.toLowerCase() === "s" ? "Save" : "Undo";
-    document.querySelector("#result").textContent = action + " handler ran";
-  });
+    const action = event.code === "KeyS" ? "Save" : "Undo";
+    output.textContent = action + " handler ran";
+  }
+
+  addEventListener("keydown", handleShortcut);
 </script>
 </html>`;
 
 function statusLabel(value: Capability | Recommendation): string {
   return value.replaceAll("-", " ").toUpperCase();
+}
+
+function statusSymbol(value: Capability | Recommendation): string {
+  if (value === "yes" || value === "recommended") return "✓";
+  if (value === "conditional" || value === "acceptable") return "!";
+  if (value === "no" || value === "avoid") return "×";
+  return "?";
+}
+
+const codeTokenPattern = /(<!--[\s\S]*?-->|\/\*[\s\S]*?\*\/|\/\/[^\n]*|<\/?[a-z][^>]*>|`(?:\\.|[^`])*`|"(?:\\.|[^"])*"|'(?:\\.|[^'])*'|\b(?:addEventListener|const|else|false|function|if|null|return|true)\b|\b\d+\b)/gi;
+
+function highlightCode(source: string) {
+  return source.split(codeTokenPattern).map((token, index) => {
+    const className = token.startsWith("//") || token.startsWith("/*") || token.startsWith("<!--")
+      ? "token-comment"
+      : token.startsWith("<")
+        ? "token-tag"
+        : /^["'`]/.test(token)
+          ? "token-string"
+          : /^\d/.test(token)
+            ? "token-number"
+            : /^(addEventListener|const|else|false|function|if|null|return|true)$/.test(token)
+              ? "token-keyword"
+              : "";
+    return className ? <span className={className} key={`${index}-${token}`}>{token}</span> : token;
+  });
 }
 
 function layoutLabel(layout: Layout): string {
@@ -93,6 +124,7 @@ export default function App() {
   const [dataset, setDataset] = useState<Dataset | null>(null);
   const [testCount, setTestCount] = useState(0);
   const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem("canibind-theme") as Theme | null) ?? "system");
+  const [showStatusSymbols, setShowStatusSymbols] = useState(() => localStorage.getItem("canibind-status-symbols") === "true");
   const [labCode, setLabCode] = useState(initialLabCode);
   const [labPreview, setLabPreview] = useState(initialLabCode);
   const [contributionActive, setContributionActive] = useState(false);
@@ -102,11 +134,16 @@ export default function App() {
   const [observedContributionKey, setObservedContributionKey] = useState<string | null>(null);
   const [detectedKeyCode, setDetectedKeyCode] = useState<string | null>(null);
   const detectionFlashTimer = useRef<number | null>(null);
+  const highlightedCodeRef = useRef<HTMLPreElement>(null);
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
     localStorage.setItem("canibind-theme", theme);
   }, [theme]);
+
+  useEffect(() => {
+    localStorage.setItem("canibind-status-symbols", String(showStatusSymbols));
+  }, [showStatusSymbols]);
 
   useEffect(() => {
     fetch(`${import.meta.env.BASE_URL}data/compatibility.v1.json`)
@@ -219,9 +256,9 @@ export default function App() {
       <header className="topbar">
         <a className="brand" href={import.meta.env.BASE_URL} aria-label="Can I Bind home"><span className="brand-mark">CIB?</span><span className="brand-copy"><strong>Can I Bind?</strong><small>Open data for usable keyboard interfaces.</small></span></a>
         <nav aria-label="Primary navigation">
-          <a href="#explore">{copy.nav.test}</a><a href="#keyboard">{copy.nav.keyboard}</a><a href="#lab">{copy.nav.lab}</a><a href="#contribute">{copy.nav.contribute}</a><a href="#about">{copy.nav.about}</a>
+          <a href="#explore">{copy.nav.test}</a><a href="#keyboard">{copy.nav.keyboard}</a><a href="#contribute">{copy.nav.contribute}</a><a href="#lab">{copy.nav.lab}</a><a href="#about">{copy.nav.about}</a>
         </nav>
-        <label className="theme-control"><span>Theme</span><select value={theme} onChange={(event) => setTheme(event.target.value as Theme)}><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
+        <div className="header-controls"><label className="theme-control"><span>Theme</span><select value={theme} onChange={(event) => setTheme(event.target.value as Theme)}><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label><label className="status-symbol-control"><span>Status symbols</span><button type="button" aria-pressed={showStatusSymbols} onClick={() => setShowStatusSymbols((value) => !value)}>{showStatusSymbols ? "On" : "Off"}</button></label></div>
       </header>
 
       <section className="hero" id="explore">
@@ -244,9 +281,9 @@ export default function App() {
       </section>
 
       <section className="verdict-grid" aria-label="Shortcut verdict">
-        <VerdictCard title="Can I bind it?" value={reference?.capability ?? "lack-of-data"} text={reference?.note ?? "No verified observation exists for this exact browser, OS, version, and layout yet."} label="Recorded evidence" detail={reference?.evidence ?? "none"} />
-        <VerdictCard title="Should I bind it?" value={recommendation.value} text={recommendation.reason} label="Intended action" detail={intents.find((item) => item.value === intent)?.label ?? intent} />
-        <VerdictCard title="Live observation" value={liveCapability} heading={liveCapability === "conditional" ? "EVENT RECEIVED" : "NOT TESTED"} text={liveCapability === "conditional" ? "The page received the event and requested preventDefault(). Confirm separately that no browser or OS action occurred." : "The continuous listener is ready. Press a shortcut to create a live observation."} label="Events this session" detail={String(testCount)} />
+        <VerdictCard title="Can I bind it?" value={reference?.capability ?? "lack-of-data"} text={reference?.note ?? "No verified observation exists for this exact browser, OS, version, and layout yet."} label="Recorded evidence" detail={reference?.evidence ?? "none"} showSymbol={showStatusSymbols} />
+        <VerdictCard title="Should I bind it?" value={recommendation.value} text={recommendation.reason} label="Intended action" detail={intents.find((item) => item.value === intent)?.label ?? intent} showSymbol={showStatusSymbols} />
+        <VerdictCard title="Live observation" value={liveCapability} heading={liveCapability === "conditional" ? "EVENT RECEIVED" : "NOT TESTED"} text={liveCapability === "conditional" ? "The page received the event and requested preventDefault(). Confirm separately that no browser or OS action occurred." : "The continuous listener is ready. Press a shortcut to create a live observation."} label="Events this session" detail={String(testCount)} showSymbol={showStatusSymbols} />
       </section>
 
       <section className="keyboard-section" id="keyboard">
@@ -261,15 +298,10 @@ export default function App() {
             const rec = recommendationFor(item.label, modifiers, intent, environment.layout);
             const isCurrent = shortcut.key.toUpperCase() === item.label.toUpperCase() && shortcut.modifiers.length === modifiers.length && modifiers.every((modifier) => shortcut.modifiers.includes(modifier));
             const isDetected = item.code === detectedKeyCode;
-            return <button type="button" className={`keyboard-key key-${rec.value} ${item.size ? `key-${item.size}` : ""} ${isCurrent ? "current-key" : ""} ${isDetected ? "detected-key" : ""}`} title={rec.reason} aria-label={`${item.label}: ${statusLabel(rec.value)}`} onClick={() => selectKeyboardKey(item.label)} key={`${item.code}-${item.label}`}><span>{item.label}</span></button>;
+            return <button type="button" className={`keyboard-key key-${rec.value} ${item.size ? `key-${item.size}` : ""} ${isCurrent ? "current-key" : ""} ${isDetected ? "detected-key" : ""}`} title={rec.reason} aria-label={`${item.label}: ${statusLabel(rec.value)}`} onClick={() => selectKeyboardKey(item.label)} key={`${item.code}-${item.label}`}><span>{item.label}</span>{showStatusSymbols ? <b className="key-status-symbol" aria-hidden="true">{statusSymbol(rec.value)}</b> : null}</button>;
           })}</div>)}
         </div>
-        <div className="legend"><span><i className="legend-recommended" /> Recommended</span><span><i className="legend-acceptable" /> Acceptable</span><span><i className="legend-avoid" /> Avoid</span><span><i className="legend-lack" /> Lack of data</span></div>
-      </section>
-
-      <section className="lab-section" id="lab">
-        <div className="section-heading"><div><p className="eyebrow">Test it yourself</p><h2>Edit the example and run it safely</h2><p>The preview runs in a sandboxed frame. Try changing which key is handled, whether default behavior is prevented, or what action is shown.</p></div><button className="primary-button" type="button" onClick={() => setLabPreview(labCode)}>Run example</button></div>
-        <div className="code-lab"><label><span>HTML + JavaScript</span><textarea spellCheck={false} value={labCode} onChange={(event) => setLabCode(event.target.value)} /></label><div className="preview-pane"><span>Result</span><iframe title="Keyboard shortcut code preview" sandbox="allow-scripts" srcDoc={labPreview} /></div></div>
+        <div className={`legend ${showStatusSymbols ? "legend-with-symbols" : ""}`}><span><i className="legend-recommended">{showStatusSymbols ? "✓" : ""}</i> Recommended</span><span><i className="legend-acceptable">{showStatusSymbols ? "!" : ""}</i> Acceptable</span><span><i className="legend-avoid">{showStatusSymbols ? "×" : ""}</i> Avoid</span><span><i className="legend-lack">{showStatusSymbols ? "?" : ""}</i> Lack of data</span></div>
       </section>
 
       <section className="contribute-section" id="contribute">
@@ -281,17 +313,22 @@ export default function App() {
         </div>}
       </section>
 
+      <section className="lab-section" id="lab">
+        <div className="section-heading"><div><p className="eyebrow">Implementation</p><h2>How does this work?</h2><p>This is the binding handler developers need: detect the platform modifier, identify the physical key with <code>event.code</code>, reject unrelated keys, and call <code>preventDefault()</code> only for a binding the application owns.</p></div><button className="primary-button" type="button" onClick={() => setLabPreview(labCode)}>Run example</button></div>
+        <div className="code-lab"><label className="code-editor"><span>Editable HTML + JavaScript</span><div className="editor-stack"><pre className="code-highlight" aria-hidden="true" ref={highlightedCodeRef}><code>{highlightCode(labCode)}</code></pre><textarea aria-label="Editable shortcut binding example" spellCheck={false} value={labCode} onChange={(event) => setLabCode(event.target.value)} onScroll={(event) => { if (!highlightedCodeRef.current) return; highlightedCodeRef.current.scrollTop = event.currentTarget.scrollTop; highlightedCodeRef.current.scrollLeft = event.currentTarget.scrollLeft; }} /></div></label><div className="preview-pane"><span>Sandboxed result</span><iframe title="Keyboard shortcut code preview" sandbox="allow-scripts" srcDoc={labPreview} /></div></div>
+      </section>
+
       <section className="about-section" id="about">
         <p className="eyebrow">About the reference</p><h2>Compatibility is not the same as good design</h2>
         <div className="about-grid"><article><h3>What “YES” means</h3><ol><li>The exact combination reaches the page.</li><li>The application handler runs.</li><li>The competing browser or OS action does not occur.</li></ol></article><article><h3>Why Ctrl + F may work once</h3><p>That is application code, not standard browser behavior. The first press is usually handled and cancelled by the site. After its search field opens, a second condition may skip the handler and allow the browser Find command.</p></article></div>
 
         <h3 className="subheading">Convention guardrails</h3>
-        <div className="table-wrap"><table><thead><tr><th>Action</th><th>Windows / Linux</th><th>macOS</th><th>Guidance</th></tr></thead><tbody>
-          <tr><td>Undo</td><td><kbd>Ctrl + Z</kbd></td><td><kbd>Command (⌘) + Z</kbd></td><td>Established convention. Do not reuse for Save.</td></tr>
-          <tr><td>Redo</td><td><kbd>Ctrl + Y</kbd></td><td><kbd>Command (⌘) + Shift + Z</kbd></td><td>Platform conventions differ.</td></tr>
-          <tr><td>Save</td><td><kbd>Ctrl + S</kbd></td><td><kbd>Command (⌘) + S</kbd></td><td>Strong convention; verify browser Save Page conflict.</td></tr>
-          <tr><td>Find</td><td><kbd>Ctrl + F</kbd></td><td><kbd>Command (⌘) + F</kbd></td><td>Familiar but competes with browser Find.</td></tr>
-          <tr><td>Help / shortcuts</td><td><kbd>?</kbd></td><td><kbd>?</kbd></td><td>Poor international choice where the character requires Shift.</td></tr>
+        <div className="table-wrap"><table><caption>Recommendations are based on documented platform and browser conventions. Primary sources are linked per row.</caption><thead><tr><th>Action</th><th>Windows / Linux</th><th>macOS</th><th>Guidance</th><th>Sources</th></tr></thead><tbody>
+          <tr><td>Undo</td><td><kbd>Ctrl + Z</kbd></td><td><kbd>Command (⌘) + Z</kbd></td><td>Established convention. Do not reuse for Save.</td><td className="source-links"><a href="https://support.microsoft.com/en-us/windows/keyboard-shortcuts-in-apps-139014e7-177b-d1f3-eb2e-7298b2599a34">Microsoft</a><a href="https://support.apple.com/en-us/102650">Apple</a></td></tr>
+          <tr><td>Redo</td><td><kbd>Ctrl + Y</kbd></td><td><kbd>Command (⌘) + Shift + Z</kbd></td><td>Platform conventions differ.</td><td className="source-links"><a href="https://support.microsoft.com/en-us/windows/keyboard-shortcuts-in-apps-139014e7-177b-d1f3-eb2e-7298b2599a34">Microsoft</a><a href="https://support.apple.com/en-us/102650">Apple</a></td></tr>
+          <tr><td>Save</td><td><kbd>Ctrl + S</kbd></td><td><kbd>Command (⌘) + S</kbd></td><td>Strong convention; verify browser Save Page conflict.</td><td className="source-links"><a href="https://support.google.com/chrome/answer/157179?co=GENIE.Platform%3DDesktop&hl=en">Chrome</a><a href="https://support.apple.com/en-us/102650">Apple</a></td></tr>
+          <tr><td>Find</td><td><kbd>Ctrl + F</kbd></td><td><kbd>Command (⌘) + F</kbd></td><td>Familiar but competes with browser Find.</td><td className="source-links"><a href="https://support.microsoft.com/en-us/windows/keyboard-shortcuts-in-apps-139014e7-177b-d1f3-eb2e-7298b2599a34">Microsoft</a><a href="https://support.google.com/chrome/answer/157179?co=GENIE.Platform%3DDesktop&hl=en">Chrome</a><a href="https://support.apple.com/en-us/102650">Apple</a></td></tr>
+          <tr><td>Help / shortcuts</td><td><kbd>?</kbd></td><td><kbd>?</kbd></td><td>Poor international choice where the character requires Shift.</td><td className="source-links"><a href="https://support.apple.com/en-us/102650">Apple</a><a href="https://wicg.github.io/keyboard-map/">Keyboard Map</a></td></tr>
         </tbody></table></div>
         <p className="terminology-note"><strong>Terminology:</strong> Can I Bind? uses Command (⌘) on macOS and Windows for the Windows key. Browser code exposes both through the technical <code>Meta</code> modifier.</p>
 
@@ -324,6 +361,6 @@ function DetectedSelect({ label, detected, value, detail, options, onChange }: {
   return <label className="field"><span className="field-heading"><b>{label}</b><em>{detected ? "Detected" : "Selected"}</em></span><select value={value} onChange={(event) => onChange(event.target.value)}>{options.map((option) => <option key={option}>{option}</option>)}</select>{detail && <small>{detail}</small>}</label>;
 }
 
-function VerdictCard({ title, value, heading, text, label, detail }: { title: string; value: Capability | Recommendation; heading?: string; text: string; label: string; detail: string }) {
-  return <article className="verdict-card"><div className="card-heading"><p>{title}</p><span className={`status-dot status-${value}`} aria-hidden="true" /></div><h2>{heading ?? statusLabel(value)}</h2><p>{text}</p><div className="evidence-row"><span>{label}</span><strong>{detail}</strong></div></article>;
+function VerdictCard({ title, value, heading, text, label, detail, showSymbol }: { title: string; value: Capability | Recommendation; heading?: string; text: string; label: string; detail: string; showSymbol: boolean }) {
+  return <article className="verdict-card"><div className="card-heading"><p>{title}</p><span className={`status-dot status-${value}`} aria-hidden="true">{showSymbol ? <span>{statusSymbol(value)}</span> : null}</span></div><h2>{heading ?? statusLabel(value)}</h2><p>{text}</p><div className="evidence-row"><span>{label}</span><strong>{detail}</strong></div></article>;
 }
