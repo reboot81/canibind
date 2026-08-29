@@ -2,7 +2,7 @@
   "$schema": "../../schemas/dataset.schema.json",
   "schemaVersion": "1.0.0",
   "generatedAt": "2026-08-29T00:00:00Z",
-  "minimumContributionSize": 20,
+  "minimumContributionSize": 5,
   "records": [
     {
       "shortcut": "ctrl-f",

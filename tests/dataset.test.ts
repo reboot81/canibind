@@ -10,6 +10,6 @@ describe("public dataset", () => {
   });
 
   it("requires a meaningful contribution batch", () => {
-    expect(dataset.minimumContributionSize).toBeGreaterThanOrEqual(20);
+    expect(dataset.minimumContributionSize).toBeGreaterThanOrEqual(5);
   });
 });

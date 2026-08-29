@@ -18,11 +18,12 @@ export function shortcutFromEvent(event: KeyboardEvent, platform: KeyboardPlatfo
   );
   const logicalKey = normalizeKey(event.key);
   const physicalKey = keyLabelForCode(event.code, layout, platform) ?? logicalKey;
-  const selected = shortcutFromSelection(physicalKey, modifiers, platform, event.code);
+  const displayedKey = event.key.length === 1 && event.key !== "\uf8ff" ? logicalKey : physicalKey;
+  const selected = shortcutFromSelection(displayedKey, modifiers, platform, event.code);
   return {
     ...selected,
     code: event.code,
-    logicalKey: logicalKey === physicalKey ? undefined : logicalKey,
+    logicalKey: logicalKey === displayedKey ? undefined : logicalKey,
   };
 }
 
@@ -61,12 +62,13 @@ function keyIdFromCode(code: string, label: string): string {
   return id || label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 
-export function shouldCaptureShortcut(event: Pick<KeyboardEvent, "key" | "ctrlKey" | "altKey" | "metaKey" | "target" | "repeat">): boolean {
+export function shouldCaptureShortcut(event: Pick<KeyboardEvent, "key" | "ctrlKey" | "altKey" | "metaKey" | "shiftKey" | "target" | "repeat">): boolean {
   if (event.repeat || modifierOrder.includes(event.key)) return false;
   const target = event.target as HTMLElement | null;
   const editable = target?.matches?.("input, textarea, select, [contenteditable='true']") ?? false;
   if (editable) return false;
-  return event.ctrlKey || event.altKey || event.metaKey || event.key.startsWith("F") || event.key === "Escape";
+  const shiftedPunctuation = event.shiftKey && event.key.length === 1 && !/[\p{L}\p{N}]/u.test(event.key);
+  return event.ctrlKey || event.altKey || event.metaKey || shiftedPunctuation || event.key.startsWith("F") || event.key === "Escape";
 }
 
 export function normalizeKey(key: string): string {
@@ -74,7 +76,7 @@ export function normalizeKey(key: string): string {
   return key.length === 1 ? key.toUpperCase() : key;
 }
 
-export function recommendationFor(key: string, modifiers: string[], intent: Intent, layout: Layout): { value: Recommendation; reason: string } {
+export function recommendationFor(key: string, modifiers: string[], intent: Intent, layout: Layout, browser = "the browser"): { value: Recommendation; reason: string } {
   const upper = key.toUpperCase();
   const ctrl = modifiers.includes("Control") || modifiers.includes("Meta");
   if (!ctrl && ["?", "/"].includes(key) && layout !== "us") {
@@ -88,9 +90,12 @@ export function recommendationFor(key: string, modifiers: string[], intent: Inte
   const convention = conventions[upper];
   if (convention?.intent === intent) {
     const browserConflict = ["F", "L", "N"].includes(upper);
+    const overrideReason = upper === "F"
+      ? `${convention.label} follows convention. When the event is received and cancelled, this page overrides ${browser} Find and replaces that browser shortcut while the handler owns it.`
+      : `${convention.label} is understandable, but this shortcut competes with browser chrome.`;
     return {
       value: browserConflict ? "acceptable" : "recommended",
-      reason: browserConflict ? `${convention.label} is understandable, but this shortcut competes with browser chrome.` : `${convention.label} follows a widely understood platform convention.`,
+      reason: browserConflict ? overrideReason : `${convention.label} follows a widely understood platform convention.`,
     };
   }
   if (["Q", "R", "W", "T"].includes(upper)) return { value: "avoid", reason: "This combination conflicts with a critical browser action." };

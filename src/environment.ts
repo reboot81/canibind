@@ -62,13 +62,26 @@ export async function detectKeyboardLayout(): Promise<Layout | null> {
   if (!keyboard?.getLayoutMap) return null;
   try {
     const map = await keyboard.getLayoutMap();
+    const q = map.get("KeyQ")?.toLowerCase();
+    const w = map.get("KeyW")?.toLowerCase();
+    const a = map.get("KeyA")?.toLowerCase();
+    const e = map.get("KeyE")?.toLowerCase();
+    const r = map.get("KeyR")?.toLowerCase();
     const y = map.get("KeyY")?.toLowerCase();
     const z = map.get("KeyZ")?.toLowerCase();
     const bracket = map.get("BracketLeft")?.toLowerCase();
     const semicolon = map.get("Semicolon")?.toLowerCase();
-    if (y === "z" && z === "y") return "german";
+    const quote = map.get("Quote")?.toLowerCase();
+    if (q === "'" && w === ",") return "dvorak";
+    if (q === "q" && e === "f" && r === "p") return "colemak";
+    if (q === "a" && a === "q") return "french";
+    if (semicolon === "ñ") return "spanish";
+    if (semicolon === "ç") return "portuguese";
+    if (semicolon === "ò") return "italian";
+    if (bracket === "å" && semicolon === "æ" && quote === "ø") return "danish";
+    if (bracket === "å" && semicolon === "ø" && quote === "æ") return "norwegian";
     if (bracket === "å" || semicolon === "ö") return "swedish";
-    if (y === "y" && z === "z") return null;
+    if (y === "z" && z === "y") return bracket === "ü" ? "german" : "swiss-german";
     return null;
   } catch {
     return null;
