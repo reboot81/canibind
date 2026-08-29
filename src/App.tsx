@@ -110,7 +110,8 @@ export default function App() {
     const onKeyDown = (event: KeyboardEvent) => {
       if (!isListening || !shouldCaptureShortcut(event)) return;
       event.preventDefault();
-      const next = shortcutFromEvent(event);
+      const platform: KeyboardPlatform = ["macOS", "iOS", "iPadOS"].includes(environment.os) ? "mac" : "windows";
+      const next = shortcutFromEvent(event, platform, environment.layout);
       if (!next) return;
       setShortcut(next);
       setLiveCapability("conditional");
@@ -122,7 +123,7 @@ export default function App() {
     };
     window.addEventListener("keydown", onKeyDown, { capture: true });
     return () => window.removeEventListener("keydown", onKeyDown, { capture: true });
-  }, [environment.browser, environment.os, isListening]);
+  }, [environment.browser, environment.layout, environment.os, isListening]);
 
   useEffect(() => {
     document.title = `${shortcut.display} — Can I Bind?`;
@@ -182,7 +183,7 @@ export default function App() {
           <kbd>{shortcut.display}</kbd>
           <button type="button" aria-pressed={isListening} onClick={() => setIsListening((value) => !value)}>{isListening ? "Pause" : "Resume"}</button>
         </div>
-        <p className="capture-note">Latest event: <strong>{lastDetectedAt ? `${shortcut.display} detected at ${lastDetectedAt}` : "No shortcut detected yet"}</strong>. Typing in form fields and the code editor is intentionally ignored.</p>
+        <p className="capture-note">Latest event: <strong>{lastDetectedAt ? `${shortcut.display} detected at ${lastDetectedAt}` : "No shortcut detected yet"}</strong>.{shortcut.logicalKey ? <> Browser value: <code>event.key = {JSON.stringify(shortcut.logicalKey)}</code>.</> : null} Typing in form fields and the code editor is intentionally ignored.</p>
       </section>
 
       <section className="context-panel" aria-label="Test context">

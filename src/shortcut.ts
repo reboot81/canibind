@@ -1,16 +1,56 @@
-import type { Intent, Layout, Recommendation, Shortcut } from "./types";
+import { keyboardRows } from "./keyboard";
+import type { Intent, KeyboardPlatform, Layout, Recommendation, Shortcut } from "./types";
 
 const modifierOrder = ["Control", "Alt", "Shift", "Meta"];
-const modifierLabels: Record<string, string> = { Control: "Ctrl", Alt: "Alt", Shift: "Shift", Meta: "Meta" };
+const modifierLabels: Record<KeyboardPlatform, Record<string, string>> = {
+  windows: { Control: "Ctrl", Alt: "Alt", Shift: "Shift", Meta: "Win" },
+  mac: { Control: "Control", Alt: "Option", Shift: "Shift", Meta: "Command" },
+};
 
-export function shortcutFromEvent(event: KeyboardEvent): Shortcut | null {
+export function shortcutFromEvent(event: KeyboardEvent, platform: KeyboardPlatform = "windows", layout: Layout = "us"): Shortcut | null {
   if (modifierOrder.includes(event.key)) return null;
   const modifiers = modifierOrder.filter((modifier) =>
     modifier === "Control" ? event.ctrlKey : modifier === "Alt" ? event.altKey : modifier === "Shift" ? event.shiftKey : event.metaKey,
   );
-  const key = normalizeKey(event.key);
-  const display = [...modifiers.map((item) => modifierLabels[item]), key].join(" + ");
-  return { id: [...modifiers.map((item) => modifierLabels[item].toLowerCase()), key.toLowerCase()].join("-"), display, modifiers, key };
+  const logicalKey = normalizeKey(event.key);
+  const physicalKey = keyLabelForCode(event.code, layout, platform) ?? logicalKey;
+  const labels = modifierLabels[platform];
+  const display = [...modifiers.map((item) => labels[item]), physicalKey].join(" + ");
+  const modifierIds = modifiers.map((item) => item === "Control" ? "ctrl" : item.toLowerCase());
+  return {
+    id: [...modifierIds, keyIdFromCode(event.code, physicalKey)].join("-"),
+    display,
+    modifiers,
+    key: physicalKey,
+    code: event.code,
+    logicalKey: logicalKey === physicalKey ? undefined : logicalKey,
+  };
+}
+
+export function keyLabelForCode(code: string, layout: Layout, platform: KeyboardPlatform): string | null {
+  return keyboardRows(layout, platform).flat().find((key) => key.code === code)?.label ?? fallbackCodeLabel(code);
+}
+
+function fallbackCodeLabel(code: string): string | null {
+  if (/^Key[A-Z]$/.test(code)) return code.slice(3);
+  if (/^Digit[0-9]$/.test(code)) return code.slice(5);
+  if (/^F(?:[1-9]|1[0-2])$/.test(code)) return code;
+  const labels: Record<string, string> = {
+    Space: "Space", Escape: "Esc", Enter: "Enter", Tab: "Tab", Backspace: "Backspace", Delete: "Delete",
+    ArrowLeft: "Left", ArrowRight: "Right", ArrowUp: "Up", ArrowDown: "Down", Home: "Home", End: "End",
+    PageUp: "Page Up", PageDown: "Page Down",
+  };
+  return labels[code] ?? null;
+}
+
+function keyIdFromCode(code: string, label: string): string {
+  if (/^Key[A-Z]$/.test(code)) return code.slice(3).toLowerCase();
+  if (/^Digit[0-9]$/.test(code)) return code.slice(5);
+  const id = code
+    .replace(/^Arrow/, "")
+    .replace(/([a-z])([A-Z])/g, "$1-$2")
+    .toLowerCase();
+  return id || label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 
 export function shouldCaptureShortcut(event: Pick<KeyboardEvent, "key" | "ctrlKey" | "altKey" | "metaKey" | "target" | "repeat">): boolean {

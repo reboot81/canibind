@@ -130,6 +130,7 @@ kbd { padding: 3px 7px; border: 1px solid var(--line-strong); border-bottom-widt
 .listener button, .keyboard-toolbar button { padding: 8px 13px; border: 1px solid var(--line-strong); border-radius: 3px; color: var(--text); background: var(--surface-alt); cursor: pointer; }
 .pulse { width: 16px; height: 16px; flex: 0 0 auto; border: 3px solid var(--surface); border-radius: 50%; background: var(--yes); box-shadow: 0 0 0 3px color-mix(in srgb, var(--yes) 55%, var(--surface)); }
 .capture-note { margin: 12px 0 0; color: var(--muted); font-size: 12px; }
+.capture-note code { padding: 1px 4px; border: 1px solid var(--line); background: var(--surface-alt); color: var(--text); }
 
 .context-panel { margin-top: 24px; padding: 18px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; border: 1px solid var(--line); background: var(--surface-alt); }
 .field { display: grid; align-content: start; gap: 7px; }
