@@ -79,6 +79,8 @@ button:focus-visible, a:focus-visible, select:focus-visible, textarea:focus-visi
 a { color: var(--link); text-underline-offset: 3px; }
 main { min-height: 100vh; }
 kbd { padding: 3px 7px; border: 1px solid var(--line-strong); border-bottom-width: 2px; border-radius: 4px; background: var(--surface); color: var(--text); font: 600 .88em ui-monospace, SFMono-Regular, Menlo, monospace; white-space: nowrap; }
+.skip-link { position: fixed; top: 8px; left: 8px; z-index: 100; padding: 10px 14px; border: 2px solid var(--focus); color: var(--text); background: var(--surface); font-weight: 700; transform: translateY(-160%); }
+.skip-link:focus { transform: translateY(0); }
 
 .topbar {
   position: sticky;
@@ -101,13 +103,13 @@ kbd { padding: 3px 7px; border: 1px solid var(--line-strong); border-bottom-widt
 .brand-copy strong { font-size: 14px; line-height: 1.1; }
 .brand-copy small { color: var(--muted); font-size: 10px; font-weight: 500; line-height: 1.2; white-space: nowrap; }
 .topbar nav { display: flex; align-items: center; gap: 22px; font-size: 13px; }
-.topbar nav a { color: var(--text); text-decoration: none; }
+.topbar nav a { min-height: 36px; display: inline-flex; align-items: center; color: var(--text); text-decoration: none; }
 .topbar nav a:hover { text-decoration: underline; }
 .header-controls { display: flex; align-items: end; gap: 10px; }
 .theme-control, .status-symbol-control { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--muted); }
 .theme-control select { width: auto; padding: 6px 28px 6px 8px; }
 .status-symbol-control button { min-width: 42px; padding: 6px 9px; border: 1px solid var(--line-strong); border-radius: 3px; color: var(--text); background: var(--surface-alt); cursor: pointer; }
-.status-symbol-control button[aria-pressed="true"] { border-color: var(--focus); color: #fff; background: var(--focus); }
+.status-symbol-control button[aria-pressed="true"] { border-color: var(--focus); color: var(--status-mark); background: var(--focus); }
 
 .hero, .context-panel, .verdict-grid, .lab-section, .contribute-section, .about-section, footer {
   width: min(1180px, calc(100% - 40px));
@@ -179,13 +181,12 @@ select { width: 100%; padding: 9px 34px 9px 10px; border: 1px solid var(--line-s
 .keyboard-toolbar fieldset { margin: 0; padding: 0; border: 0; }
 .keyboard-toolbar legend, .keyboard-toolbar label > span { display: block; margin-bottom: 6px; color: var(--muted); font-size: 11px; font-weight: 700; }
 .keyboard-toolbar button { margin-right: 5px; }
-.keyboard-toolbar button.selected { border-color: var(--focus); background: var(--focus); color: #fff; }
+.keyboard-toolbar button.selected { border-color: var(--focus); background: var(--focus); color: var(--status-mark); }
 .keyboard-toolbar label { min-width: 170px; }
 .keyboard { padding: 20px; overflow-x: auto; border: 1px solid var(--line-strong); background: var(--surface-alt); }
 .keyboard-row { min-width: 1060px; display: flex; justify-content: center; gap: 7px; margin-bottom: 7px; }
 .keyboard-row:last-child { margin-bottom: 0; }
 .keyboard-key { position: relative; flex: 0 0 66px; height: 56px; padding: 8px; display: grid; place-items: center; border: 2px solid var(--line-strong); border-bottom-width: 4px; border-radius: 4px; color: var(--unknown); background: var(--unknown-bg); cursor: pointer; }
-.keyboard-key:hover { filter: brightness(.96); }
 .keyboard-key span { font: 650 12px ui-monospace, monospace; }
 .key-status-symbol { position: absolute; top: 3px; right: 5px; font: 900 13px/1 ui-monospace, monospace; }
 .keyboard-key.key-wide { flex-basis: 112px; }
@@ -256,12 +257,11 @@ caption { padding: 11px 15px; border-bottom: 1px solid var(--line); color: var(-
 th, td { padding: 13px 15px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
 th { background: var(--surface-alt); font-size: 12px; }
 tbody tr:last-child td { border-bottom: 0; }
-.source-links { min-width: 92px; }.source-links a { display: block; margin-bottom: 4px; }
+.source-links { min-width: 92px; }.source-links a { min-height: 24px; display: flex; align-items: center; margin-bottom: 2px; }
 .reference-list { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--line-strong); background: var(--surface); }
 .reference-list a { min-height: 112px; padding: 20px; display: grid; align-content: start; gap: 7px; border-bottom: 1px solid var(--line); text-decoration: none; }
 .reference-list a:nth-child(odd) { border-right: 1px solid var(--line); }
 .reference-list a:nth-last-child(-n+2) { border-bottom: 0; }
-.reference-list a:hover strong { text-decoration: underline; }
 .reference-list span { color: var(--muted); font-size: 13px; line-height: 1.45; }
 .about-site-box { margin-top: 28px; display: grid; grid-template-columns: 1.25fr 1.5fr 1fr 1.2fr; border: 1px solid var(--line-strong); background: var(--surface); }
 .about-site-box > div { min-width: 0; padding: 22px; border-right: 1px solid var(--line); }
@@ -276,7 +276,22 @@ tbody tr:last-child td { border-bottom: 0; }
 footer { padding: 36px 0; display: grid; grid-template-columns: 1fr 1fr auto; align-items: center; gap: 28px; border-top: 1px solid var(--line-strong); font-size: 12px; }
 .footer-home:hover .brand-mark { border-color: var(--focus); background: var(--surface); }
 footer > p { color: var(--muted); }
+.accessibility-status { min-height: 28px; display: inline-flex; align-items: center; }
 footer > div:last-child { display: flex; gap: 18px; }
+footer > div:last-child a { min-height: 32px; display: inline-flex; align-items: center; }
+
+@media (hover: hover) {
+  .brand, .topbar nav a, .status-symbol-control button, .listener button, .keyboard-toolbar button, .primary-button, .keyboard-key, .reference-list a, footer a, select { transition: color .15s ease, background-color .15s ease, border-color .15s ease, box-shadow .15s ease, transform .15s ease, filter .15s ease; }
+  .brand:hover { color: var(--link); }
+  .topbar nav a:hover, footer a:hover { text-decoration-thickness: 2px; }
+  .status-symbol-control button:hover, .listener button:hover, .keyboard-toolbar button:hover { border-color: var(--focus); background: var(--surface); }
+  .status-symbol-control button[aria-pressed="true"]:hover, .keyboard-toolbar button.selected:hover { filter: brightness(1.12); }
+  .primary-button:not(:disabled):hover { border-color: var(--focus); background: #034b96; box-shadow: 0 2px 7px color-mix(in srgb, var(--focus) 28%, transparent); }
+  select:hover { border-color: var(--focus); }
+  .keyboard-key:hover { z-index: 1; filter: brightness(.96); transform: translateY(-2px); box-shadow: 0 3px 0 color-mix(in srgb, currentColor 38%, transparent); }
+  .reference-list a:hover { background: var(--surface-alt); box-shadow: inset 4px 0 0 var(--focus); }
+  .reference-list a:hover strong { text-decoration: underline; }
+}
 
 @media (max-width: 980px) {
   .topbar { grid-template-columns: 1fr auto; }.topbar nav { display: none; }
@@ -301,4 +316,10 @@ footer > div:last-child { display: flex; gap: 18px; }
   footer { grid-template-columns: 1fr; }footer > div:last-child { flex-wrap: wrap; }
 }
 
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .keyboard-key.detected-key { animation: none; box-shadow: 0 0 0 6px var(--focus); filter: brightness(1.35); } }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; } .keyboard-key.detected-key { animation: none; box-shadow: 0 0 0 6px var(--focus); filter: brightness(1.35); } }
+
+@media (forced-colors: active) {
+  .code-highlight { display: none; }
+  .code-lab textarea { color: CanvasText; background: Canvas; -webkit-text-fill-color: CanvasText; }
+  .status-dot, .legend i { border: 2px solid currentColor; }
+}

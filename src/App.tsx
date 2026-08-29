@@ -252,14 +252,17 @@ export default function App() {
   };
 
   return (
-    <main>
+    <>
+      <a className="skip-link" href="#main-content">Skip to main content</a>
       <header className="topbar">
         <a className="brand" href={import.meta.env.BASE_URL} aria-label="Can I Bind home"><span className="brand-mark">CIB?</span><span className="brand-copy"><strong>Can I Bind?</strong><small>Open data for usable keyboard interfaces.</small></span></a>
         <nav aria-label="Primary navigation">
           <a href="#explore">{copy.nav.test}</a><a href="#keyboard">{copy.nav.keyboard}</a><a href="#contribute">{copy.nav.contribute}</a><a href="#lab">{copy.nav.lab}</a><a href="#about">{copy.nav.about}</a>
         </nav>
-        <div className="header-controls"><label className="theme-control"><span>Theme</span><select value={theme} onChange={(event) => setTheme(event.target.value as Theme)}><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label><label className="status-symbol-control"><span>Status symbols</span><button type="button" aria-pressed={showStatusSymbols} onClick={() => setShowStatusSymbols((value) => !value)}>{showStatusSymbols ? "On" : "Off"}</button></label></div>
+        <div className="header-controls"><label className="theme-control"><span>Theme</span><select value={theme} onChange={(event) => setTheme(event.target.value as Theme)}><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label><div className="status-symbol-control"><span>Status symbols</span><button type="button" aria-label={`Status symbols: ${showStatusSymbols ? "on" : "off"}`} aria-pressed={showStatusSymbols} onClick={() => setShowStatusSymbols((value) => !value)}>{showStatusSymbols ? "On" : "Off"}</button></div></div>
       </header>
+
+      <main id="main-content" tabIndex={-1}>
 
       <section className="hero" id="explore">
         <p className="eyebrow">Browser keyboard shortcut reference</p>
@@ -301,7 +304,7 @@ export default function App() {
             return <button type="button" className={`keyboard-key key-${rec.value} ${item.size ? `key-${item.size}` : ""} ${isCurrent ? "current-key" : ""} ${isDetected ? "detected-key" : ""}`} title={rec.reason} aria-label={`${item.label}: ${statusLabel(rec.value)}`} onClick={() => selectKeyboardKey(item.label)} key={`${item.code}-${item.label}`}><span>{item.label}</span>{showStatusSymbols ? <b className="key-status-symbol" aria-hidden="true">{statusSymbol(rec.value)}</b> : null}</button>;
           })}</div>)}
         </div>
-        <div className={`legend ${showStatusSymbols ? "legend-with-symbols" : ""}`}><span><i className="legend-recommended">{showStatusSymbols ? "✓" : ""}</i> Recommended</span><span><i className="legend-acceptable">{showStatusSymbols ? "!" : ""}</i> Acceptable</span><span><i className="legend-avoid">{showStatusSymbols ? "×" : ""}</i> Avoid</span><span><i className="legend-lack">{showStatusSymbols ? "?" : ""}</i> Lack of data</span></div>
+        <div className={`legend ${showStatusSymbols ? "legend-with-symbols" : ""}`}><span><i className="legend-recommended" aria-hidden="true">{showStatusSymbols ? "✓" : ""}</i> Recommended</span><span><i className="legend-acceptable" aria-hidden="true">{showStatusSymbols ? "!" : ""}</i> Acceptable</span><span><i className="legend-avoid" aria-hidden="true">{showStatusSymbols ? "×" : ""}</i> Avoid</span><span><i className="legend-lack" aria-hidden="true">{showStatusSymbols ? "?" : ""}</i> Lack of data</span></div>
       </section>
 
       <section className="contribute-section" id="contribute">
@@ -352,8 +355,10 @@ export default function App() {
         </aside>
       </section>
 
-      <footer><a className="brand footer-home" href={import.meta.env.BASE_URL} aria-label="Can I Bind home"><span className="brand-mark">CIB?</span><span>Can I Bind?</span></a><p>Open data for usable keyboard interfaces.</p><div><a href="https://github.com/reboot81/canibind">Source</a><a href={`${import.meta.env.BASE_URL}data/compatibility.v1.json`}>CC0 dataset</a><a href="#about">Methodology</a></div></footer>
-    </main>
+      </main>
+
+      <footer><a className="brand footer-home" href={import.meta.env.BASE_URL} aria-label="Can I Bind home"><span className="brand-mark">CIB?</span><span>Can I Bind?</span></a><p>Open data for usable keyboard interfaces.<br /><a className="accessibility-status" href="https://www.w3.org/TR/WCAG22/">Accessibility: tested against WCAG 2.2 AA</a></p><div><a href="https://github.com/reboot81/canibind">Source</a><a href={`${import.meta.env.BASE_URL}data/compatibility.v1.json`}>CC0 dataset</a><a href="#about">Methodology</a></div></footer>
+    </>
   );
 }
 
