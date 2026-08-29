@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { normalizeKey, recommendationFor, shortcutPath } from "../src/shortcut";
+import { normalizeKey, recommendationFor, shortcutPath, shouldCaptureShortcut } from "../src/shortcut";
 
 describe("shortcut model", () => {
   it("normalizes character and space keys", () => {
@@ -18,5 +18,12 @@ describe("shortcut model", () => {
 
   it("creates shareable compatibility paths", () => {
     expect(shortcutPath({ id: "ctrl-f", display: "Ctrl + F", modifiers: ["Control"], key: "F" }, "Edge", "Windows 11")).toBe("/ctrl-f/edge/windows-11");
+  });
+
+  it("captures shortcuts continuously but ignores typing fields", () => {
+    const pageTarget = { matches: () => false } as unknown as EventTarget;
+    const inputTarget = { matches: () => true } as unknown as EventTarget;
+    expect(shouldCaptureShortcut({ key: "f", ctrlKey: true, altKey: false, metaKey: false, repeat: false, target: pageTarget })).toBe(true);
+    expect(shouldCaptureShortcut({ key: "f", ctrlKey: true, altKey: false, metaKey: false, repeat: false, target: inputTarget })).toBe(false);
   });
 });

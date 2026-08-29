@@ -1,5 +1,5 @@
 export const en = {
-  nav: { explore: "Explore", keyboard: "Keyboard map", contribute: "Contribute", dataset: "Dataset" },
+  nav: { test: "Test", keyboard: "Keyboard map", lab: "Test it yourself", contribute: "Contribute", about: "About", dataset: "Dataset" },
   hero: {
     eyebrow: "The keyboard compatibility reference",
     title: "Can I bind",

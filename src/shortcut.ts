@@ -13,6 +13,14 @@ export function shortcutFromEvent(event: KeyboardEvent): Shortcut | null {
   return { id: [...modifiers.map((item) => modifierLabels[item].toLowerCase()), key.toLowerCase()].join("-"), display, modifiers, key };
 }
 
+export function shouldCaptureShortcut(event: Pick<KeyboardEvent, "key" | "ctrlKey" | "altKey" | "metaKey" | "target" | "repeat">): boolean {
+  if (event.repeat || modifierOrder.includes(event.key)) return false;
+  const target = event.target as HTMLElement | null;
+  const editable = target?.matches?.("input, textarea, select, [contenteditable='true']") ?? false;
+  if (editable) return false;
+  return event.ctrlKey || event.altKey || event.metaKey || event.key.startsWith("F") || event.key === "Escape";
+}
+
 export function normalizeKey(key: string): string {
   if (key === " ") return "Space";
   return key.length === 1 ? key.toUpperCase() : key;

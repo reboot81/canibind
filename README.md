@@ -11,6 +11,23 @@ questions deliberately separate:
 The site starts in English, with message files separated from the interface so
 additional locales can be added without restructuring the application.
 
+## Current reference tools
+
+- a continuous page-level shortcut listener that stays active between tests;
+- explicit browser, operating-system, layout, and intended-action context;
+- an interactive Windows/Linux or macOS keyboard with US, UK, Swedish/Nordic,
+  and German layouts;
+- system-default light/dark mode with an explicit user override;
+- a sandboxed HTML and JavaScript test lab;
+- a guided 20-combination contribution run with per-result confirmation;
+- methodology, established shortcut conventions, WCAG guidance, and primary
+  keyboard-event references.
+
+Browser and operating system are detected from browser-provided client data.
+Keyboard layout is detected only when `Keyboard.getLayoutMap()` is available
+and yields a distinctive mapping; otherwise the UI explicitly asks for a manual
+selection instead of guessing.
+
 ## Status model
 
 Capability: `YES`, `CONDITIONAL`, `NO`, `LACK OF DATA`.
