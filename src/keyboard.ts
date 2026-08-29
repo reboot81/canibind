@@ -47,7 +47,7 @@ export function keyboardRows(layout: Layout, platform: KeyboardPlatform): KeyDef
   const map = Object.fromEntries(codes.map((code, index) => [code, values[index]]));
   const key = (code: string, label = map[code] ?? code, size?: KeyDefinition["size"]): KeyDefinition => ({ code, label, size });
   const bottom = platform === "mac"
-    ? [key("Fn","fn"), key("ControlLeft","Control (⌃)", "wide"), key("AltLeft","Option (⌥)", "wide"), key("MetaLeft","Command (⌘)", "wide"), key("Space","Space", "space"), key("MetaRight","Command (⌘)", "wide"), key("AltRight","Option (⌥)", "wide")]
+    ? [key("ControlLeft","Control (⌃)", "wide"), key("AltLeft","Option (⌥)", "wide"), key("MetaLeft","Command (⌘)", "wide"), key("Space","Space", "space"), key("MetaRight","Command (⌘)", "wide"), key("AltRight","Option (⌥)", "wide")]
     : [key("ControlLeft","Ctrl", "wide"), key("MetaLeft","Windows", "wide"), key("AltLeft","Alt", "wide"), key("Space","Space", "space"), key("AltRight","Alt", "wide"), key("ControlRight","Ctrl", "wide")];
   return [
     [key("Escape","Esc"), ...["F1","F2","F3","F4","F5","F6","F7","F8","F9","F10","F11","F12"].map((value) => key(value, value))],

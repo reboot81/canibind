@@ -23,8 +23,8 @@ const navigation = [
 
 function UnderlinedLabel({ label, letter }: { label: string; letter: string }) {
   const index = label.toLowerCase().indexOf(letter.toLowerCase());
-  if (index < 0) return label;
-  return <>{label.slice(0, index)}<u>{label[index]}</u>{label.slice(index + 1)}</>;
+  if (index < 0) return <span>{label}</span>;
+  return <span>{label.slice(0, index)}<u>{label[index]}</u>{label.slice(index + 1)}</span>;
 }
 
 export default function Demo({ open, onClose, platform }: DemoProps) {
@@ -61,6 +61,7 @@ export default function Demo({ open, onClose, platform }: DemoProps) {
     if (!open) return;
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.isComposing || event.repeat) return;
+      event.stopImmediatePropagation();
       const key = event.key.toLowerCase();
       const primaryModifier = event.ctrlKey || event.metaKey;
 
@@ -153,7 +154,7 @@ export default function Demo({ open, onClose, platform }: DemoProps) {
 
         <nav className="crm-nav" aria-label="ACME modules">
           {navigation.map((item) => <button type="button" className={view === item.id ? "active" : ""} aria-current={view === item.id ? "page" : undefined} aria-keyshortcuts={item.shortcut} title={`${item.label} — ${item.shortcut}`} onMouseDown={(event) => event.preventDefault()} onClick={keyboardOnly(() => { setView(item.id); setAnnouncement(`${item.label} view opened`); })} key={item.id}><UnderlinedLabel label={item.label} letter={item.letter} /><kbd>{item.shortcut}</kbd></button>)}
-          <button type="button" aria-keyshortcuts="Shift+?" title="Open keyboard help — Shift + ?" onMouseDown={(event) => event.preventDefault()} onClick={keyboardOnly(() => setHelpOpen((value) => !value))}><u>H</u>elp<kbd>Shift + ?</kbd></button>
+          <button type="button" aria-keyshortcuts="Shift+?" title="Open keyboard help — Shift + ?" onMouseDown={(event) => event.preventDefault()} onClick={keyboardOnly(() => setHelpOpen((value) => !value))}><UnderlinedLabel label="Help" letter="H" /><kbd>Shift + ?</kbd></button>
         </nav>
 
         <div className="crm-shell">

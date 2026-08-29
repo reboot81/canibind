@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { contributionShortcuts } from "../src/keyboard";
+import { contributionShortcuts, keyboardRows } from "../src/keyboard";
 import { normalizeKey, recommendationFor, shortcutFromEvent, shortcutFromSelection, shortcutPath, shouldCaptureShortcut } from "../src/shortcut";
 
 describe("shortcut model", () => {
@@ -21,11 +21,11 @@ describe("shortcut model", () => {
     expect(shortcutPath({ id: "ctrl-f", display: "Ctrl + F", modifiers: ["Control"], key: "F" }, "Edge", "Windows 11")).toBe("/ctrl-f/edge/windows-11");
   });
 
-  it("captures shortcuts continuously but ignores typing fields", () => {
+  it("captures shortcuts continuously, including while a form control has focus", () => {
     const pageTarget = { matches: () => false } as unknown as EventTarget;
     const inputTarget = { matches: () => true } as unknown as EventTarget;
     expect(shouldCaptureShortcut({ key: "f", ctrlKey: true, altKey: false, metaKey: false, shiftKey: false, repeat: false, target: pageTarget })).toBe(true);
-    expect(shouldCaptureShortcut({ key: "f", ctrlKey: true, altKey: false, metaKey: false, shiftKey: false, repeat: false, target: inputTarget })).toBe(false);
+    expect(shouldCaptureShortcut({ key: "f", ctrlKey: true, altKey: false, metaKey: false, shiftKey: false, repeat: false, target: inputTarget })).toBe(true);
     expect(shouldCaptureShortcut({ key: "?", ctrlKey: false, altKey: false, metaKey: false, shiftKey: true, repeat: false, target: pageTarget })).toBe(true);
   });
 
@@ -64,5 +64,9 @@ describe("shortcut model", () => {
 
     expect(contributionShortcuts).toHaveLength(20);
     expect(contributionShortcuts.filter((shortcut) => excluded.includes(shortcut))).toEqual([]);
+  });
+
+  it("does not present the hardware-managed Fn key as a bindable macOS key", () => {
+    expect(keyboardRows("swedish", "mac").flat().some((key) => key.code === "Fn")).toBe(false);
   });
 });

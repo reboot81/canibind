@@ -64,9 +64,6 @@ function keyIdFromCode(code: string, label: string): string {
 
 export function shouldCaptureShortcut(event: Pick<KeyboardEvent, "key" | "ctrlKey" | "altKey" | "metaKey" | "shiftKey" | "target" | "repeat">): boolean {
   if (event.repeat || modifierOrder.includes(event.key)) return false;
-  const target = event.target as HTMLElement | null;
-  const editable = target?.matches?.("input, textarea, select, [contenteditable='true']") ?? false;
-  if (editable) return false;
   const shiftedPunctuation = event.shiftKey && event.key.length === 1 && !/[\p{L}\p{N}]/u.test(event.key);
   return event.ctrlKey || event.altKey || event.metaKey || shiftedPunctuation || event.key.startsWith("F") || event.key === "Escape";
 }

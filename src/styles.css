@@ -187,7 +187,8 @@ select { width: 100%; padding: 9px 34px 9px 10px; border: 1px solid var(--line-s
 .keyboard-row { min-width: 1060px; display: flex; justify-content: center; gap: 7px; margin-bottom: 7px; }
 .keyboard-row:last-child { margin-bottom: 0; }
 .keyboard-key { position: relative; flex: 0 0 66px; height: 56px; padding: 8px; display: grid; place-items: center; border: 2px solid var(--line-strong); border-bottom-width: 4px; border-radius: 4px; color: var(--unknown); background: var(--unknown-bg); cursor: pointer; }
-.keyboard-key span { font: 650 12px ui-monospace, monospace; }
+.keyboard-key span { font: 650 20px ui-monospace, monospace; }
+.keyboard-key.key-wide span, .keyboard-key.key-space span, .keyboard-key.modifier-key span { font-size: 13.5px; }
 .key-status-symbol { position: absolute; top: 3px; right: 5px; font: 900 13px/1 ui-monospace, monospace; }
 .keyboard-key.key-wide { flex-basis: 112px; }
 .keyboard-key.key-space { flex-basis: 360px; }
@@ -519,6 +520,8 @@ footer > div:last-child a { min-height: 32px; display: inline-flex; align-items:
 .result-buttons.compact { grid-template-columns: repeat(3, 1fr); }
 .result-buttons.compact legend { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 .contribution-ready { padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; gap: 18px; background: var(--yes-bg); }
+.contribution-ready > div { display: grid; gap: 5px; }
+.contribution-ready small { color: var(--muted); line-height: 1.4; }
 
 .demo-section {
   width: 100%;
@@ -730,7 +733,8 @@ footer > div:last-child a { min-height: 32px; display: inline-flex; align-items:
   .guided-test { grid-template-columns: 1fr; }
   .result-buttons.compact { grid-template-columns: 1fr; }
   .contribution-log li { grid-template-columns: 1fr; }
-  .contribution-ready, .demo-section { grid-template-columns: 1fr; align-items: start; }
+  .contribution-ready { flex-direction: column; align-items: flex-start; }
+  .demo-section { grid-template-columns: 1fr; align-items: start; }
   .technique-grid { grid-template-columns: 1fr; }
   .technique-grid article, .technique-grid article:nth-child(3n), .technique-grid article:nth-last-child(-n+3) { border-right: 0; border-bottom: 1px solid var(--line); }
   .technique-grid article:last-child { border-bottom: 0; }
