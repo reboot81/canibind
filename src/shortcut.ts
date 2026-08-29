@@ -2,6 +2,10 @@ import { keyboardRows } from "./keyboard";
 import type { Intent, KeyboardPlatform, Layout, Recommendation, Shortcut } from "./types";
 
 const modifierOrder = ["Control", "Alt", "Shift", "Meta"];
+const modifierDisplayOrder: Record<KeyboardPlatform, string[]> = {
+  windows: ["Control", "Alt", "Shift", "Meta"],
+  mac: ["Meta", "Control", "Alt", "Shift"],
+};
 const modifierLabels: Record<KeyboardPlatform, Record<string, string>> = {
   windows: { Control: "Ctrl", Alt: "Alt", Shift: "Shift", Meta: "Win" },
   mac: { Control: "Control", Alt: "Option", Shift: "Shift", Meta: "Command" },
@@ -14,17 +18,21 @@ export function shortcutFromEvent(event: KeyboardEvent, platform: KeyboardPlatfo
   );
   const logicalKey = normalizeKey(event.key);
   const physicalKey = keyLabelForCode(event.code, layout, platform) ?? logicalKey;
-  const labels = modifierLabels[platform];
-  const display = [...modifiers.map((item) => labels[item]), physicalKey].join(" + ");
-  const modifierIds = modifiers.map((item) => item === "Control" ? "ctrl" : item.toLowerCase());
+  const selected = shortcutFromSelection(physicalKey, modifiers, platform, event.code);
   return {
-    id: [...modifierIds, keyIdFromCode(event.code, physicalKey)].join("-"),
-    display,
-    modifiers,
-    key: physicalKey,
+    ...selected,
     code: event.code,
     logicalKey: logicalKey === physicalKey ? undefined : logicalKey,
   };
+}
+
+export function shortcutFromSelection(key: string, modifiers: string[], platform: KeyboardPlatform, code = ""): Shortcut {
+  const order = modifierDisplayOrder[platform];
+  const orderedModifiers = [...new Set(modifiers)].sort((left, right) => order.indexOf(left) - order.indexOf(right));
+  const labels = modifierLabels[platform];
+  const display = [...orderedModifiers.map((modifier) => labels[modifier]), key].join(" + ");
+  const modifierIds = orderedModifiers.map((modifier) => modifier === "Control" ? "ctrl" : modifier.toLowerCase());
+  return { id: [...modifierIds, keyIdFromCode(code, key)].join("-"), display, modifiers: orderedModifiers, key };
 }
 
 export function keyLabelForCode(code: string, layout: Layout, platform: KeyboardPlatform): string | null {

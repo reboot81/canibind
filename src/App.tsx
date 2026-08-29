@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { detectBrowserOverride, detectEnvironment, detectKeyboardLayout } from "./environment";
 import { t } from "./i18n";
 import { contributionShortcuts, keyboardRows } from "./keyboard";
-import { recommendationFor, shortcutFromEvent, shortcutPath, shouldCaptureShortcut } from "./shortcut";
+import { recommendationFor, shortcutFromEvent, shortcutFromSelection, shortcutPath, shouldCaptureShortcut } from "./shortcut";
 import type {
   Capability,
   ContributionResult,
@@ -34,6 +34,16 @@ const intents: { value: Intent; label: string }[] = [
   { value: "list", label: "Open list" },
   { value: "new-record", label: "Create new record" },
 ];
+const modifierChoices: Record<KeyboardPlatform, { label: string; value: string }[]> = {
+  windows: [
+    { label: "Ctrl", value: "Control" }, { label: "Alt", value: "Alt" },
+    { label: "Shift", value: "Shift" }, { label: "Win", value: "Meta" },
+  ],
+  mac: [
+    { label: "⌘ Command", value: "Meta" }, { label: "⌃ Control", value: "Control" },
+    { label: "⌥ Option", value: "Alt" }, { label: "Shift", value: "Shift" },
+  ],
+};
 
 const initialLabCode = `<!doctype html>
 <html lang="en">
@@ -73,7 +83,7 @@ export default function App() {
   const [osDetected, setOsDetected] = useState(true);
   const [layoutDetected, setLayoutDetected] = useState(false);
   const [intent, setIntent] = useState<Intent>("search");
-  const [modifier, setModifier] = useState("Control");
+  const [modifiers, setModifiers] = useState<string[]>(() => detectEnvironment().os === "macOS" ? ["Meta"] : ["Control"]);
   const [keyboardPlatform, setKeyboardPlatform] = useState<KeyboardPlatform>(() => detectEnvironment().os === "macOS" ? "mac" : "windows");
   const [dataset, setDataset] = useState<Dataset | null>(null);
   const [testCount, setTestCount] = useState(0);
@@ -139,11 +149,33 @@ export default function App() {
   const expectedContribution = contributionShortcuts[contributionIndex];
   const displayedExpectedContribution = (keyboardPlatform === "mac" ? expectedContribution?.replace(/^Ctrl/, "⌘") : expectedContribution) ?? "";
 
+  const switchKeyboardPlatform = (platform: KeyboardPlatform) => {
+    setKeyboardPlatform(platform);
+    setModifiers((current) => current.map((modifier) => {
+      if (platform === "mac" && modifier === "Control") return "Meta";
+      if (platform === "windows" && modifier === "Meta") return "Control";
+      return modifier;
+    }).filter((modifier, index, values) => values.indexOf(modifier) === index));
+  };
+
+  const toggleModifier = (modifier: string) => {
+    setModifiers((current) => current.includes(modifier) ? current.filter((item) => item !== modifier) : [...current, modifier]);
+  };
+
+  const selectKeyboardKey = (key: string) => {
+    const next = shortcutFromSelection(key, modifiers, keyboardPlatform);
+    setShortcut(next);
+    setLiveCapability("lack-of-data");
+    setLastDetectedAt(null);
+    const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+    window.history.replaceState(null, "", `${base}${shortcutPath(next, environment.browser, environment.os)}`);
+  };
+
   const changeOs = (os: string) => {
     setEnvironment({ ...environment, os });
     setOsDetected(false);
-    if (os === "macOS" || os === "iOS" || os === "iPadOS") setKeyboardPlatform("mac");
-    if (os === "Windows" || os === "Linux") setKeyboardPlatform("windows");
+    if (os === "macOS" || os === "iOS" || os === "iPadOS") switchKeyboardPlatform("mac");
+    if (os === "Windows" || os === "Linux") switchKeyboardPlatform("windows");
   };
 
   const recordContribution = () => {
@@ -200,18 +232,17 @@ export default function App() {
       </section>
 
       <section className="keyboard-section" id="keyboard">
-        <div className="section-heading"><div><p className="eyebrow">Layout-aware guidance</p><h2>Interactive keyboard reference</h2><p>Choose a platform, physical layout, modifier, and intended action. Pressing a real shortcut updates both the keyboard and the verdict above.</p></div><div className="live-readout"><span className="pulse" /><small>Live</small><strong>{shortcut.display}</strong></div></div>
+        <div className="section-heading"><div><p className="eyebrow">Layout-aware guidance</p><h2>Interactive keyboard reference</h2><p>Choose a platform, physical layout, one or more modifiers, and intended action. Pressing a real shortcut updates both the keyboard and the verdict above.</p></div><div className="live-readout"><span className="pulse" /><small>Live</small><strong>{shortcut.display}</strong></div></div>
         <div className="keyboard-toolbar">
-          <fieldset><legend>Keyboard</legend><button type="button" className={keyboardPlatform === "windows" ? "selected" : ""} onClick={() => setKeyboardPlatform("windows")}>Windows / Linux</button><button type="button" className={keyboardPlatform === "mac" ? "selected" : ""} onClick={() => setKeyboardPlatform("mac")}>macOS</button></fieldset>
+          <fieldset><legend>Keyboard</legend><button type="button" className={keyboardPlatform === "windows" ? "selected" : ""} aria-pressed={keyboardPlatform === "windows"} onClick={() => switchKeyboardPlatform("windows")}>Windows / Linux</button><button type="button" className={keyboardPlatform === "mac" ? "selected" : ""} aria-pressed={keyboardPlatform === "mac"} onClick={() => switchKeyboardPlatform("mac")}>macOS</button></fieldset>
           <label><span>Layout</span><select value={environment.layout} onChange={(event) => { setEnvironment({ ...environment, layout: event.target.value as Layout }); setLayoutDetected(false); }}>{layouts.map((layout) => <option value={layout.value} key={layout.value}>{layout.label}</option>)}</select></label>
-          <fieldset><legend>Modifier</legend>{[["None", ""], [keyboardPlatform === "mac" ? "⌘ Command" : "Ctrl", "Control"], [keyboardPlatform === "mac" ? "⌥ Option" : "Alt", "Alt"], ["Shift", "Shift"]].map(([label, value]) => <button className={modifier === value ? "selected" : ""} onClick={() => setModifier(value)} type="button" key={label}>{label}</button>)}</fieldset>
+          <fieldset><legend>Modifiers</legend><button className={modifiers.length === 0 ? "selected" : ""} aria-pressed={modifiers.length === 0} onClick={() => setModifiers([])} type="button">None</button>{modifierChoices[keyboardPlatform].map(({ label, value }) => <button className={modifiers.includes(value) ? "selected" : ""} aria-pressed={modifiers.includes(value)} onClick={() => toggleModifier(value)} type="button" key={value}>{label}</button>)}</fieldset>
         </div>
         <div className="keyboard" role="group" aria-label={`${keyboardPlatform} ${layoutLabel(environment.layout)} keyboard`}>
           {keyboard.map((row, rowIndex) => <div className="keyboard-row" key={rowIndex}>{row.map((item) => {
-            const rec = recommendationFor(item.label, modifier ? [modifier] : [], intent, environment.layout);
-            const modifierLabel = keyboardPlatform === "mac" && modifier === "Control" ? "⌘" : modifier === "Control" ? "Ctrl" : modifier;
-            const isCurrent = shortcut.key.toUpperCase() === item.label.toUpperCase() && (modifier ? shortcut.modifiers.length > 0 : shortcut.modifiers.length === 0);
-            return <button type="button" className={`keyboard-key key-${rec.value} ${item.size ? `key-${item.size}` : ""} ${isCurrent ? "current-key" : ""}`} title={rec.reason} aria-label={`${item.label}: ${statusLabel(rec.value)}`} onClick={() => setShortcut({ id: `${modifier ? modifier.toLowerCase() + "-" : ""}${item.label.toLowerCase()}`, display: `${modifierLabel ? modifierLabel + " + " : ""}${item.label}`, modifiers: modifier ? [modifier] : [], key: item.label })} key={`${item.code}-${item.label}`}><span>{item.label}</span></button>;
+            const rec = recommendationFor(item.label, modifiers, intent, environment.layout);
+            const isCurrent = shortcut.key.toUpperCase() === item.label.toUpperCase() && shortcut.modifiers.length === modifiers.length && modifiers.every((modifier) => shortcut.modifiers.includes(modifier));
+            return <button type="button" className={`keyboard-key key-${rec.value} ${item.size ? `key-${item.size}` : ""} ${isCurrent ? "current-key" : ""}`} title={rec.reason} aria-label={`${item.label}: ${statusLabel(rec.value)}`} onClick={() => selectKeyboardKey(item.label)} key={`${item.code}-${item.label}`}><span>{item.label}</span></button>;
           })}</div>)}
         </div>
         <div className="legend"><span><i className="legend-recommended" /> Recommended</span><span><i className="legend-acceptable" /> Acceptable</span><span><i className="legend-avoid" /> Avoid</span><span><i className="legend-lack" /> Lack of data</span></div>

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { normalizeKey, recommendationFor, shortcutFromEvent, shortcutPath, shouldCaptureShortcut } from "../src/shortcut";
+import { normalizeKey, recommendationFor, shortcutFromEvent, shortcutFromSelection, shortcutPath, shouldCaptureShortcut } from "../src/shortcut";
 
 describe("shortcut model", () => {
   it("normalizes character and space keys", () => {
@@ -41,5 +41,11 @@ describe("shortcut model", () => {
     } as KeyboardEvent, "windows", "german");
 
     expect(shortcut).toMatchObject({ display: "Ctrl + Alt + Q", key: "Q", logicalKey: "@" });
+  });
+
+  it("combines independently selected macOS modifiers in a stable order", () => {
+    const shortcut = shortcutFromSelection("Z", ["Shift", "Meta"], "mac");
+
+    expect(shortcut).toEqual({ id: "meta-shift-z", display: "Command + Shift + Z", modifiers: ["Meta", "Shift"], key: "Z" });
   });
 });
