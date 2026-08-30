@@ -557,13 +557,13 @@ footer > div:last-child a { min-height: 32px; display: inline-flex; align-items:
 .guardrail-tabs { margin: 0 0 12px; display: flex; flex-wrap: wrap; gap: 7px; }
 .guardrail-tabs button { padding: 8px 11px; border: 1px solid var(--line-strong); border-radius: 3px; color: var(--text); background: var(--surface-alt); cursor: pointer; font-size: 12px; font-weight: 700; }
 .guardrail-tabs button[aria-selected="true"] { border-color: var(--focus); color: var(--status-mark); background: var(--focus); }
-.guardrail-table table { min-width: 1320px; table-layout: fixed; }
-.guardrail-table th:nth-child(1) { width: 15%; }
-.guardrail-table th:nth-child(2) { width: 18%; }
-.guardrail-table th:nth-child(3) { width: 25%; }
-.guardrail-table th:nth-child(4) { width: 29%; }
+.guardrail-table table { width: 100%; min-width: 0; table-layout: fixed; }
+.guardrail-table th:nth-child(1) { width: 14%; }
+.guardrail-table th:nth-child(2) { width: 17%; }
+.guardrail-table th:nth-child(3) { width: 22%; }
+.guardrail-table th:nth-child(4) { width: 34%; }
 .guardrail-table th:nth-child(5) { width: 13%; }
-.guardrail-table td kbd { white-space: nowrap; line-height: 1.7; }
+.guardrail-table td kbd { white-space: normal; line-height: 1.7; overflow-wrap: anywhere; }
 .guardrail-table .table-group th {
   padding-block: 10px;
   color: var(--text);
