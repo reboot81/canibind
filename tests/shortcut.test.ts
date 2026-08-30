@@ -45,6 +45,14 @@ describe("shortcut model", () => {
     expect(shortcut).toMatchObject({ display: "Ctrl + Alt + @", key: "@", code: "KeyQ" });
   });
 
+  it("keeps a letter key readable when Option and Shift produce a symbol", () => {
+    const shortcut = shortcutFromEvent({
+      key: "◊", code: "KeyA", ctrlKey: true, altKey: true, shiftKey: true, metaKey: false,
+    } as KeyboardEvent, "mac", "swedish");
+
+    expect(shortcut).toMatchObject({ display: "Control (⌃) + Option (⌥) + Shift + A", key: "A", code: "KeyA", logicalKey: "◊" });
+  });
+
   it("preserves shifted punctuation from a Swedish macOS keyboard", () => {
     const shortcut = shortcutFromEvent({
       key: "?", code: "Minus", ctrlKey: false, altKey: false, shiftKey: true, metaKey: false,

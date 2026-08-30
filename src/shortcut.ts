@@ -18,7 +18,10 @@ export function shortcutFromEvent(event: KeyboardEvent, platform: KeyboardPlatfo
   );
   const logicalKey = normalizeKey(event.key);
   const physicalKey = keyLabelForCode(event.code, layout, platform) ?? logicalKey;
-  const displayedKey = event.key.length === 1 && event.key !== "\uf8ff" ? logicalKey : physicalKey;
+  const physicalLetterOrDigit = /^(Key[A-Z]|Digit\d)$/.test(event.code);
+  const displayedKey = physicalLetterOrDigit && event.shiftKey && !/[\p{L}\p{N}]/u.test(event.key)
+    ? physicalKey
+    : event.key.length === 1 && event.key !== "\uf8ff" ? logicalKey : physicalKey;
   const selected = shortcutFromSelection(displayedKey, modifiers, platform, event.code);
   return {
     ...selected,
