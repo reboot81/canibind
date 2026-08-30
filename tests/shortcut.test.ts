@@ -13,6 +13,15 @@ describe("shortcut model", () => {
     expect(recommendationFor("Z", ["Control"], "save", "swedish").value).toBe("avoid");
   });
 
+  it("uses the active primary modifier and protects editing conventions", () => {
+    expect(recommendationFor("Z", ["Meta"], "save", "swedish").reason).toContain("⌘ + Z conventionally means Undo");
+    expect(recommendationFor("S", ["Meta"], "undo", "swedish").reason).toContain("⌘ + S conventionally means Save");
+    expect(recommendationFor("C", ["Meta"], "general", "swedish")).toMatchObject({
+      value: "avoid",
+      reason: expect.stringContaining("⌘ + C conventionally means Copy"),
+    });
+  });
+
   it("flags character shortcuts that require modifiers on Nordic layouts", () => {
     expect(recommendationFor("?", [], "general", "swedish").value).toBe("avoid");
   });

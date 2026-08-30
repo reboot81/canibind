@@ -79,6 +79,8 @@ export function normalizeKey(key: string): string {
 export function recommendationFor(key: string, modifiers: string[], intent: Intent, layout: Layout, browser = "the browser"): { value: Recommendation; reason: string } {
   const upper = key.toUpperCase();
   const ctrl = modifiers.includes("Control") || modifiers.includes("Meta");
+  const primaryModifier = modifiers.includes("Meta") ? "⌘" : "Ctrl";
+  const conventionalShortcut = `${primaryModifier} + ${upper}`;
   if (!ctrl && ["?", "/"].includes(key) && layout !== "us") {
     return { value: "avoid", reason: `${key} requires an extra modifier on ${layout} layouts and has no dedicated key.` };
   }
@@ -87,9 +89,11 @@ export function recommendationFor(key: string, modifiers: string[], intent: Inte
     return { value: "acceptable", reason: "A modifier-assisted combination is selected. No strong convention is recorded here; verify the exact browser, operating system, and keyboard layout." };
   }
   if (!ctrl) return { value: "lack-of-data", reason: "Choose an intended action to evaluate this unmodified key." };
-  const conventions: Record<string, { intent: Intent; label: string }> = {
+  const conventions: Record<string, { intent?: Intent; label: string }> = {
     Z: { intent: "undo", label: "Undo" }, S: { intent: "save", label: "Save" }, F: { intent: "search", label: "Find" },
     L: { intent: "list", label: "List" }, N: { intent: "new-record", label: "New" },
+    C: { label: "Copy" }, X: { label: "Cut" }, V: { label: "Paste" }, A: { label: "Select all" },
+    P: { label: "Print" }, B: { label: "Bold" }, I: { label: "Italic" }, U: { label: "Underline" },
   };
   const convention = conventions[upper];
   if (convention?.intent === intent) {
@@ -103,7 +107,8 @@ export function recommendationFor(key: string, modifiers: string[], intent: Inte
     };
   }
   if (["Q", "R", "W", "T"].includes(upper)) return { value: "avoid", reason: "This combination conflicts with a critical browser action." };
-  if (convention && intent !== "general") return { value: "avoid", reason: `Ctrl + ${upper} conventionally means ${convention.label}, not the selected action.` };
+  if (convention?.intent) return { value: "avoid", reason: `${conventionalShortcut} conventionally means ${convention.label}, not the selected action.` };
+  if (convention) return { value: "avoid", reason: `${conventionalShortcut} conventionally means ${convention.label}. Do not reuse it for another action.` };
   return { value: "acceptable", reason: "No strong convention is known, but verify browser, OS, assistive technology, and layout conflicts." };
 }
 
