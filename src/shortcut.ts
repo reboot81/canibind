@@ -89,17 +89,21 @@ export function recommendationFor(key: string, modifiers: string[], intent: Inte
     return { value: "acceptable", reason: "A modifier-assisted combination is selected. No strong convention is recorded here; verify the exact browser, operating system, and keyboard layout." };
   }
   if (!ctrl) return { value: "lack-of-data", reason: "Choose an intended action to evaluate this unmodified key." };
-  const conventions: Record<string, { intent?: Intent; label: string }> = {
+  const conventions: Record<string, { intent?: Intent; label: string; browserAction?: string }> = {
     Z: { intent: "undo", label: "Undo" }, S: { intent: "save", label: "Save" }, F: { intent: "search", label: "Find" },
-    L: { intent: "list", label: "List" }, N: { intent: "new-record", label: "New" },
+    L: { intent: "list", label: "List", browserAction: "normally focuses the browser location bar" },
+    N: { intent: "new-record", label: "New" },
     C: { label: "Copy" }, X: { label: "Cut" }, V: { label: "Paste" }, A: { label: "Select all" },
-    P: { label: "Print" }, B: { label: "Bold" }, I: { label: "Italic" }, U: { label: "Underline" },
+    P: { label: "Print", browserAction: "normally opens the browser Print dialog" },
+    B: { label: "Bold" }, I: { label: "Italic" }, U: { label: "Underline" },
   };
   const convention = conventions[upper];
   if (convention?.intent === intent) {
     const browserConflict = ["F", "L", "N"].includes(upper);
     const overrideReason = upper === "F"
       ? `${convention.label} follows convention. When the event is received and cancelled, this page overrides ${browser} Find and replaces that browser shortcut while the handler owns it.`
+      : upper === "L"
+        ? `List is understandable. When the event is received and cancelled, this configuration intercepts ${browser}'s location-bar shortcut while the handler owns it; record that as a browser-specific override, not as a free shortcut.`
       : `${convention.label} is understandable, but this shortcut competes with browser chrome.`;
     return {
       value: browserConflict ? "acceptable" : "recommended",
@@ -107,8 +111,11 @@ export function recommendationFor(key: string, modifiers: string[], intent: Inte
     };
   }
   if (["Q", "R", "W", "T"].includes(upper)) return { value: "avoid", reason: "This combination conflicts with a critical browser action." };
-  if (convention?.intent) return { value: "avoid", reason: `${conventionalShortcut} conventionally means ${convention.label}, not the selected action.` };
-  if (convention) return { value: "avoid", reason: `${conventionalShortcut} conventionally means ${convention.label}. Do not reuse it for another action.` };
+  const conventionMeaning = convention?.browserAction
+    ? `${conventionalShortcut} ${convention.browserAction}`
+    : `${conventionalShortcut} conventionally means ${convention?.label}`;
+  if (convention?.intent) return { value: "avoid", reason: `${conventionMeaning}, not the selected action.` };
+  if (convention) return { value: "avoid", reason: `${conventionMeaning}, not the selected action.` };
   return { value: "acceptable", reason: "No strong convention is known, but verify browser, OS, assistive technology, and layout conflicts." };
 }
 

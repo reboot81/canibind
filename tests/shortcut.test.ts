@@ -20,6 +20,15 @@ describe("shortcut model", () => {
       value: "avoid",
       reason: expect.stringContaining("⌘ + C conventionally means Copy"),
     });
+    expect(recommendationFor("P", ["Control"], "general", "swedish").reason).toContain("Ctrl + P normally opens the browser Print dialog");
+  });
+
+  it("describes Control + L as a browser location-bar override, not a List convention", () => {
+    expect(recommendationFor("L", ["Control"], "save", "swedish").reason).toContain("normally focuses the browser location bar");
+    expect(recommendationFor("L", ["Control"], "list", "swedish", "Edge")).toMatchObject({
+      value: "acceptable",
+      reason: expect.stringContaining("intercepts Edge's location-bar shortcut"),
+    });
   });
 
   it("flags character shortcuts that require modifiers on Nordic layouts", () => {
