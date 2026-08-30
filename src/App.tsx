@@ -258,7 +258,7 @@ export default function App() {
       <a className="skip-link" href="#main-content">Skip to main content</a>
       <header className="topbar">
         <a className="brand" href={import.meta.env.BASE_URL} aria-label="Can I Bind home"><span className="brand-mark">CIB?</span><span className="brand-copy"><strong>Can I Bind?</strong><small>Open data for usable keyboard interfaces.</small></span></a>
-        <nav aria-label="Primary navigation"><a href="#keyboard">{copy.nav.keyboard}</a><a href="#implementation">{copy.nav.lab}</a><a href="#contribute">{copy.nav.contribute}</a><a href="#demo">{copy.nav.demo}</a><a href="#about">{copy.nav.about}</a></nav>
+        <nav aria-label="Primary navigation"><a href="#keyboard">{copy.nav.keyboard}</a><a href="#contribute">{copy.nav.contribute}</a><a href="#implementation">{copy.nav.lab}</a><a href="#demo">{copy.nav.demo}</a><a href="#about">{copy.nav.about}</a></nav>
         <div className="header-controls"><div className="theme-options" role="group" aria-label="Theme"><button type="button" aria-pressed={theme === "light"} title="Use light theme" onClick={() => setTheme("light")}>Light</button><button type="button" aria-pressed={theme === "dark"} title="Use dark theme" onClick={() => setTheme("dark")}>Dark</button><button type="button" aria-pressed={theme === "system"} title="Follow the system theme" onClick={() => setTheme("system")}>Auto</button></div><button className="symbol-button" type="button" aria-pressed={showStatusSymbols} title="Show or hide text symbols alongside status colours." onClick={() => setShowStatusSymbols((value) => !value)}><span aria-hidden="true">{showStatusSymbols ? "✓" : "○"}</span> Status symbols: {showStatusSymbols ? "On" : "Off"}</button></div>
       </header>
 
