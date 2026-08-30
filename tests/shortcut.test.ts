@@ -17,7 +17,7 @@ describe("shortcut model", () => {
     expect(recommendationFor("Z", ["Meta"], "save", "swedish").reason).toContain("⌘ + Z conventionally means Undo");
     expect(recommendationFor("S", ["Meta"], "undo", "swedish").reason).toContain("⌘ + S conventionally means Save");
     expect(recommendationFor("C", ["Meta"], "general", "swedish")).toMatchObject({
-      value: "avoid",
+      value: "acceptable",
       reason: expect.stringContaining("⌘ + C conventionally means Copy"),
     });
     expect(recommendationFor("P", ["Control"], "general", "swedish").reason).toContain("Ctrl + P normally opens the browser Print dialog");

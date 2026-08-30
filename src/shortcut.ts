@@ -115,7 +115,12 @@ export function recommendationFor(key: string, modifiers: string[], intent: Inte
     ? `${conventionalShortcut} ${convention.browserAction}`
     : `${conventionalShortcut} conventionally means ${convention?.label}`;
   if (convention?.intent) return { value: "avoid", reason: `${conventionMeaning}, not the selected action.` };
-  if (convention) return { value: "avoid", reason: `${conventionMeaning}, not the selected action.` };
+  if (convention) {
+    return {
+      value: "acceptable",
+      reason: `${conventionMeaning}. It can be bound when the event is received and cancelled, but that replaces the expected native command; use it only when that takeover is intentional.`,
+    };
+  }
   return { value: "acceptable", reason: "No strong convention is known, but verify browser, OS, assistive technology, and layout conflicts." };
 }
 

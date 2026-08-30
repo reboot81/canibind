@@ -13,11 +13,14 @@
   --link: #075fbd;
   --focus: #2563eb;
   --yes: #08783f;
-  --yes-bg: #d8f3e5;
+  --yes-bg: #afe6c8;
+  --key-yes-text: #075f35;
   --conditional: #915400;
-  --conditional-bg: #ffedb5;
+  --conditional-bg: #ffd775;
+  --key-conditional-text: #694000;
   --no: #a32121;
-  --no-bg: #ffd9d7;
+  --no-bg: #ffbdb8;
+  --key-no-text: #7e1b1b;
   --unknown: #4b5563;
   --unknown-bg: #e5e7eb;
   --status-mark: #ffffff;
@@ -36,10 +39,13 @@
   --focus: #60a5fa;
   --yes: #6ee7a8;
   --yes-bg: #123c2b;
+  --key-yes-text: #9af2c1;
   --conditional: #ffd166;
   --conditional-bg: #4e3a12;
+  --key-conditional-text: #ffe49c;
   --no: #ff8b83;
   --no-bg: #4c2222;
+  --key-no-text: #ffb3ad;
   --unknown: #d1d5db;
   --unknown-bg: #374151;
   --status-mark: #10151c;
@@ -59,10 +65,13 @@
     --focus: #60a5fa;
     --yes: #6ee7a8;
     --yes-bg: #123c2b;
+    --key-yes-text: #9af2c1;
     --conditional: #ffd166;
     --conditional-bg: #4e3a12;
+    --key-conditional-text: #ffe49c;
     --no: #ff8b83;
     --no-bg: #4c2222;
+    --key-no-text: #ffb3ad;
     --unknown: #d1d5db;
     --unknown-bg: #374151;
     --status-mark: #10151c;
@@ -106,11 +115,12 @@ kbd { padding: 3px 7px; border: 1px solid var(--line-strong); border-bottom-widt
 .topbar nav a { min-height: 36px; display: inline-flex; align-items: center; color: var(--text); text-decoration: none; }
 .topbar nav a:hover { text-decoration: underline; }
 .header-controls { display: flex; align-items: end; gap: 10px; }
-.theme-options { display: inline-flex; align-items: center; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 3px; background: var(--surface-alt); }
-.theme-options > span { padding: 0 8px; color: var(--muted); font-size: 11px; font-weight: 700; }
-.theme-options button, .symbol-button { padding: 6px 9px; border: 0; border-left: 1px solid var(--line); color: var(--text); background: transparent; cursor: pointer; font-size: 12px; font-weight: 700; }
-.theme-options button[aria-pressed="true"], .symbol-button[aria-pressed="true"] { color: var(--status-mark); background: var(--focus); }
-.symbol-button { border: 1px solid var(--line-strong); border-radius: 3px; background: var(--surface-alt); }
+.theme-options { display: inline-flex; align-items: center; gap: 2px; padding: 2px; border: 2px solid var(--yes); border-radius: 999px; background: var(--surface-alt); }
+.theme-options button { min-width: 58px; padding: 6px 11px; border: 0; border-radius: 999px; color: var(--yes); background: transparent; cursor: pointer; font-size: 12px; font-weight: 750; }
+.theme-options button[aria-pressed="true"] { color: var(--status-mark); background: var(--yes); }
+.symbol-button { padding: 7px 10px; border: 1px solid var(--line-strong); border-radius: 3px; color: var(--text); background: var(--surface-alt); cursor: pointer; font-size: 12px; font-weight: 700; }
+.symbol-button > span { display: inline-block; width: 1.1em; margin-right: 3px; font-weight: 900; }
+.symbol-button[aria-pressed="true"], .symbol-button[aria-pressed="true"]:hover { color: var(--status-mark); background: var(--yes); border-color: var(--yes); }
 
 .hero, .context-panel, .verdict-grid, .lab-section, .contribute-section, .about-section, footer {
   width: min(1180px, calc(100% - 40px));
@@ -153,6 +163,7 @@ kbd { padding: 3px 7px; border: 1px solid var(--line-strong); border-bottom-widt
 select { width: 100%; padding: 9px 34px 9px 10px; border: 1px solid var(--line-strong); border-radius: 3px; color: var(--text); background: var(--surface); }
 
 .verdict-grid { margin-top: 18px; margin-bottom: 82px; display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--line-strong); background: var(--surface); }
+.keyboard-verdict-grid { width: 100%; margin: 18px 0 0; }
 .verdict-card { min-height: 275px; padding: 24px; display: flex; flex-direction: column; border-right: 1px solid var(--line); }
 .verdict-card:last-child { border-right: 0; }
 .card-heading { display: flex; align-items: center; justify-content: space-between; }
@@ -193,9 +204,9 @@ select { width: 100%; padding: 9px 34px 9px 10px; border: 1px solid var(--line-s
 .key-status-symbol { position: absolute; top: 3px; right: 5px; font: 900 13px/1 ui-monospace, monospace; }
 .keyboard-key.key-wide { flex-basis: 112px; }
 .keyboard-key.key-space { flex-basis: 360px; }
-.key-recommended { color: var(--yes); border-color: var(--yes); background: var(--yes-bg); }
-.key-acceptable { color: var(--conditional); border-color: var(--conditional); background: var(--conditional-bg); }
-.key-avoid { color: var(--no); border-color: var(--no); background: var(--no-bg); }
+.key-recommended { color: var(--key-yes-text); border-color: var(--yes); background: var(--yes-bg); }
+.key-acceptable { color: var(--key-conditional-text); border-color: var(--conditional); background: var(--conditional-bg); }
+.key-avoid { color: var(--key-no-text); border-color: var(--no); background: var(--no-bg); }
 .key-lack-of-data { color: var(--unknown); border-color: var(--line-strong); background: repeating-linear-gradient(135deg, var(--unknown-bg), var(--unknown-bg) 8px, var(--surface-alt) 8px, var(--surface-alt) 16px); }
 .keyboard-key.current-key { outline: 4px solid var(--focus); outline-offset: 2px; }
 .keyboard-key.detected-key { position: relative; z-index: 2; animation: detected-key-flash 1.05s ease-out; }
@@ -429,7 +440,6 @@ footer > div:last-child a { min-height: 32px; display: inline-flex; align-items:
 }
 .modifier-instruction strong { align-self: center; font-size: 12px; }
 .modifier-instruction button { margin: 0; padding: 6px 9px; }
-.modifier-instruction small { grid-column: 1 / -1; color: var(--muted); font-size: 10px; }
 .modifier-key {
   color: var(--text);
   border-color: var(--line-strong);
