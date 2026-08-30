@@ -82,6 +82,10 @@ export function recommendationFor(key: string, modifiers: string[], intent: Inte
   if (!ctrl && ["?", "/"].includes(key) && layout !== "us") {
     return { value: "avoid", reason: `${key} requires an extra modifier on ${layout} layouts and has no dedicated key.` };
   }
+  if (!ctrl && modifiers.length) {
+    if (["Q", "R", "W"].includes(upper)) return { value: "avoid", reason: "This modifier combination can conflict with a critical browser or operating-system action." };
+    return { value: "acceptable", reason: "A modifier-assisted combination is selected. No strong convention is recorded here; verify the exact browser, operating system, and keyboard layout." };
+  }
   if (!ctrl) return { value: "lack-of-data", reason: "Choose an intended action to evaluate this unmodified key." };
   const conventions: Record<string, { intent: Intent; label: string }> = {
     Z: { intent: "undo", label: "Undo" }, S: { intent: "save", label: "Save" }, F: { intent: "search", label: "Find" },
